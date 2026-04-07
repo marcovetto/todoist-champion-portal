@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Todoist Champion Portal</title>
+  <style>
+    :root {
+      --red: #DB4035; --red-dark: #B8352C; --red-light: #FDECEA;
+      --gray-dark: #202020; --gray-mid: #555; --gray-light: #F5F5F5;
+      --gray-border: #E0E0E0; --white: #FFFFFF;
+      --sidebar-width: 260px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); color: var(--gray-dark); background: var(--gray-light); display: flex; min-height: 100vh; }
+
+    #sidebar { width: var(--sidebar-width); min-height: 100vh; background: var(--gray-dark); color: #fff; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100; overflow-y: auto; }
+    #sidebar .logo { display: flex; align-items: center; gap: 10px; padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+    #sidebar .logo img { width: 32px; height: 32px; }
+    #sidebar .logo .logo-text span { display: block; font-size: 16px; font-weight: 700; }
+    #sidebar .logo .logo-text small { font-size: 10px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.8px; }
+    #sidebar nav { flex: 1; padding: 12px 0; }
+    .nav-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.3); padding: 14px 20px 5px; }
+    #sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 9px 20px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13.5px; border-left: 3px solid transparent; transition: all 0.15s; }
+    #sidebar nav a:hover, #sidebar nav a.active { color: #fff; background: rgba(255,255,255,0.07); border-left-color: var(--red); }
+    #sidebar nav a .icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+    #sidebar .sidebar-footer { padding: 14px 20px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: rgba(255,255,255,0.25); flex-shrink: 0; }
+
+    #main { margin-left: var(--sidebar-width); flex: 1; }
+    .page-section { display: none; padding: 40px 48px; max-width: 960px; }
+    .page-section.active { display: block; }
+
+    .breadcrumb { font-size: 11px; color: var(--gray-mid); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-size: 28px; font-weight: 700; line-height: 1.2; }
+    .page-header p { margin-top: 8px; font-size: 15px; color: var(--gray-mid); line-height: 1.65; }
+    h2.section-title { font-size: 17px; font-weight: 700; margin: 32px 0 14px; }
+
+    .hero { background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%); border-radius: 16px; padding: 32px 36px; color: #fff; margin-bottom: 32px; display: flex; align-items: center; gap: 24px; }
+    .hero .hero-icon { font-size: 52px; flex-shrink: 0; }
+    .hero h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .hero p { font-size: 14px; opacity: 0.88; line-height: 1.6; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .card { background: var(--white); border: 1px solid var(--gray-border); border-radius: 12px; padding: 22px; cursor: pointer; transition: box-shadow 0.15s, transform 0.15s; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px; }
+    .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .card .card-icon { font-size: 26px; }
+    .card h3 { font-size: 15px; font-weight: 600; }
+    .card p { font-size: 13px; color: var(--gray-mid); line-height: 1.5; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; background: var(--red-light); color: var(--red); align-self: flex-start; margin-top: auto; }
+    .badge.blue { background: #E8F0FE; color: #1A73E8; }
+    .badge.green { background: #E6F4EA; color: #1E8E3E; }
+
+    .steps { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+    .step { display: flex; gap: 16px; background: var(--white); border: 1px solid var(--gray-border); border-radius: 10px; padding: 18px 20px; }
+    .step-num { width: 30px; height: 30px; border-radius: 50%; background: var(--red); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+    .step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .step-content p { font-size: 13px; color: var(--gray-mid); line-height: 1.5; }
+    .step-content ul { margin-top: 8px; padding-left: 16px; }
+    .step-content ul li { font-size: 13px; color: var(--gray-mid); line-height: 1.6; }
+    code { background: var(--gray-light); padding: 1px 6px; border-radius: 4px; font-size: 12px; font-family: monospace; color: var(--red-dark); }
+
+    .lesson-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+    .lesson-item { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--gray-border); border-radius: 10px; padding: 13px 18px; cursor: pointer; transition: box-shadow 0.15s; text-decoration: none; color: inherit; }
+    .lesson-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); border-color: var(--red); }
+    .lesson-num { font-size: 12px; font-weight: 700; color: var(--red); width: 28px; flex-shrink: 0; }
+    .lesson-item h4 { font-size: 14px; font-weight: 600; flex: 1; }
+    .lesson-meta { font-size: 11px; color: var(--gray-mid); white-space: nowrap; }
+    .lesson-type { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--gray-light); color: var(--gray-mid); white-space: nowrap; }
+    .lesson-type.demo { background: var(--red-light); color: var(--red); }
+
+    .tip-box { background: var(--red-light); border-left: 4px solid var(--red); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 24px; }
+    .tip-box strong { display: block; font-size: 11px; color: var(--red); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .tip-box p { font-size: 13px; line-height: 1.5; }
+
+    .demo-container { background: var(--white); border: 1px solid var(--gray-border); border-radius: 12px; overflow: hidden; margin-bottom: 28px; }
+    .demo-header { padding: 14px 20px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .demo-header h3 { font-size: 15px; font-weight: 600; }
+    .demo-actions { display: flex; align-items: center; gap: 10px; }
+    .demo-tag { font-size: 11px; font-weight: 600; background: var(--red-light); color: var(--red); padding: 3px 10px; border-radius: 99px; }
+    .demo-open-btn { font-size: 12px; font-weight: 600; color: var(--red); text-decoration: none; border: 1px solid var(--red); padding: 4px 12px; border-radius: 6px; transition: background 0.15s; }
+    .demo-open-btn:hover { background: var(--red-light); }
+    .demo-embed-wrapper { position: relative; padding-bottom: 62.5%; height: 0; overflow: hidden; }
+    .demo-embed-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+    .resource-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+    .resource-item { display: flex; align-items: center; gap: 16px; background: var(--white); border: 1px solid var(--gray-border); border-radius: 10px; padding: 14px 18px; text-decoration: none; color: inherit; transition: box-shadow 0.15s; cursor: pointer; }
+    .resource-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .res-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+    .res-info h4 { font-size: 14px; font-weight: 600; }
+    .res-info p { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
+    .res-action { margin-left: auto; font-size: 12px; color: var(--red); font-weight: 600; white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="logo">
+    <img src="https://todoist.com/static/favicon.ico" alt="Todoist" />
+    <div class="logo-text">
+      <span>Champion Portal</span>
+      <small>Todoist Training</small>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-label">Start here</div>
+    <a href="#" class="active" onclick="return show('overview')"><span class="icon">🏠</span> Overview</a>
+
+    <div class="nav-label">Full Course</div>
+    <a href="#" onclick="return show('m1')"><span class="icon">📗</span> Module 1 — Fundamentals</a>
+    <a href="#" onclick="return show('m2')"><span class="icon">📘</span> Module 2 — Core Features</a>
+    <a href="#" onclick="return show('m3')"><span class="icon">📙</span> Module 3 — Collaboration</a>
+    <a href="#" onclick="return show('m4')"><span class="icon">📕</span> Module 4 — Advanced</a>
+
+    <div class="nav-label">Train the Trainer</div>
+    <a href="#" onclick="return show('trainer')"><span class="icon">🎓</span> Running Sessions</a>
+    <a href="#" onclick="return show('demo-1')"><span class="icon">▶️</span> Demo 1 — Onboarding</a>
+    <a href="#" onclick="return show('demo-2')"><span class="icon">▶️</span> Demo 2 — Team Setup</a>
+
+    <div class="nav-label">Resources</div>
+    <a href="#" onclick="return show('resources')"><span class="icon">📎</span> Downloads & Links</a>
+  </nav>
+  <div class="sidebar-footer">Champion Portal v1.0</div>
+</aside>
+
+<main id="main">
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="page-section active">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal</div>
+      <h1>Welcome, Champion 🏆</h1>
+      <p>This portal is your complete guide to mastering Todoist and training your team. Work through the modules, use the interactive demos in your sessions, and follow the train-the-trainer guide to drive adoption.</p>
+    </div>
+    <div class="hero">
+      <div class="hero-icon">🏆</div>
+      <div>
+        <h2>Your role as a Todoist Champion</h2>
+        <p>You're the internal go-to person for Todoist. You don't need to know everything — you need to know enough to guide others, design your team's workflows, and know where to find answers.</p>
+      </div>
+    </div>
+    <h2 class="section-title">Course overview</h2>
+    <div class="card-grid">
+      <div class="card" onclick="show('m1')"><div class="card-icon">📗</div><h3>Module 1</h3><p>Todoist fundamentals, workspace setup, and the interface.</p><span class="badge">~30 min</span></div>
+      <div class="card" onclick="show('m2')"><div class="card-icon">📘</div><h3>Module 2</h3><p>Tasks, projects, sections, labels, filters, and reminders.</p><span class="badge">~60 min</span></div>
+      <div class="card" onclick="show('m3')"><div class="card-icon">📙</div><h3>Module 3</h3><p>Workspaces, task assignment, comments, and integrations.</p><span class="badge">~45 min</span></div>
+      <div class="card" onclick="show('m4')"><div class="card-icon">📕</div><h3>Module 4</h3><p>Workflow design, templates, reporting, and troubleshooting.</p><span class="badge">~40 min</span></div>
+      <div class="card" onclick="show('trainer')"><div class="card-icon">🎓</div><h3>Train the Trainer</h3><p>How to run onboarding sessions for your team.</p><span class="badge green">Guide</span></div>
+      <div class="card" onclick="show('demo-1')"><div class="card-icon">▶️</div><h3>Interactive Demos</h3><p>Hands-on walkthroughs for live training sessions.</p><span class="badge blue">Interactive</span></div>
+    </div>
+  </section>
+
+  <!-- MODULE 1 -->
+  <section id="m1" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 1</div>
+      <h1>Todoist Fundamentals</h1>
+      <p>Understand what Todoist is, how it's structured, and how to set up a workspace for your team.</p>
+    </div>
+    <h2 class="section-title">1.1 — What is Todoist?</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>A task manager built for teams</h4><p>Todoist helps individuals and teams capture, organise, and act on their work — across all devices. The Business plan adds workspace-level collaboration, task assignment, and admin controls.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Two workspaces in one account</h4><p>Every user has <strong>My Projects</strong> (personal) and their team workspace. Both are accessible from the same sidebar.</p></div></div>
+    </div>
+    <h2 class="section-title">1.2 — Workspace Setup</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Create your workspace</h4><p>Go to <code>todoist.com</code> → click your workspace name → <em>Create or join a workspace</em>. Give it your company or team name.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Invite team members</h4><p>From workspace Settings → Members, invite by email. Assign admin or member roles.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Organise with folders</h4><p>Click workspace name → <em>Add folder</em>. Group related projects (e.g., "Marketing Campaigns", "Operations").</p></div></div>
+    </div>
+    <div class="tip-box">
+      <strong>Champion tip</strong>
+      <p>Set up a "Training" project before your onboarding session — a sandbox where team members can practice hands-on without affecting real work.</p>
+    </div>
+    <h2 class="section-title">1.3 — The Interface</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Left sidebar</h4><p>Contains Today, Upcoming, filters, labels, and all projects. The workspace section lives at the bottom.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Available on all platforms</h4><p>Web, macOS, Windows, iOS, Android. Experience is consistent. Keyboard shortcuts vary slightly on mobile.</p></div></div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('m2')"><span class="lesson-num">→</span><h4>Next: Module 2 — Core Features</h4></div>
+    </div>
+  </section>
+
+  <!-- MODULE 2 -->
+  <section id="m2" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 2</div>
+      <h1>Core Features</h1>
+      <p>A deep dive into the features your team will use every day.</p>
+    </div>
+    <h2 class="section-title">2.1 — Tasks</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Quick Add (<code>Q</code>)</h4><p>Press <code>Q</code> anywhere to open Quick Add. Todoist parses dates, priorities, and labels from natural language automatically.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Natural language</h4><p>Examples: <code>Report due friday 3pm p1</code>, <code>Team sync every monday at 9am</code>, <code>Follow up in 3 days</code>.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Priorities</h4><p><strong>P1</strong> (red) → <strong>P2</strong> (orange) → <strong>P3</strong> (blue) → <strong>P4</strong> (default). Agree on a team-wide priority convention.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><h4>Recurring tasks</h4><p>Type <code>every monday</code>, <code>every 2 weeks</code>, <code>every month on the 1st</code>. Completing one instance auto-schedules the next.</p></div></div>
+    </div>
+    <h2 class="section-title">2.2 — Projects & Sections</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Create a project</h4><p>Click <strong>+</strong> next to workspace name → <em>Add project</em> → name, layout (List or Board), colour.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Add sections</h4><p>Three-dot menu → <em>Add section</em>. Use "To Do / In Progress / Done" or a workflow specific to your team.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Share the project</h4><p>Share icon (top right) → enter email → <em>Invite</em>. Members can join immediately.</p></div></div>
+    </div>
+    <h2 class="section-title">2.3 — Labels & Filters</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Labels</h4><p>Add labels to tasks across projects (e.g., <code>@client</code>, <code>@urgent</code>, <code>@waiting</code>). Use them to build powerful cross-project views.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Custom filters</h4><p>Filters & Labels → <strong>+</strong> → define a query. Examples: <code>today &amp; assigned to: me</code>, <code>p1 &amp; overdue</code>, <code>@waiting</code>.</p></div></div>
+    </div>
+    <div class="tip-box"><strong>Try it hands-on</strong><p>Use Demo 1 to walk through task creation and natural language input live with your team.</p></div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('demo-1')"><span class="lesson-num">▶</span><h4>Demo 1 — Onboarding Walkthrough</h4><span class="lesson-type demo">Interactive Demo</span></div>
+      <div class="lesson-item" onclick="show('m3')"><span class="lesson-num">→</span><h4>Next: Module 3 — Collaboration</h4></div>
+    </div>
+  </section>
+
+  <!-- MODULE 3 -->
+  <section id="m3" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 3</div>
+      <h1>Collaboration & Teams</h1>
+      <p>How to use the Business workspace to collaborate effectively.</p>
+    </div>
+    <h2 class="section-title">3.1 — Workspace Management</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Business plan features</h4><p>Unlimited projects, team inbox, Reporting (Activity Log), admin controls, and priority support.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Admin controls</h4><p>Manage who can create projects, invite members, and view workspace activity. Settings → Members.</p></div></div>
+    </div>
+    <h2 class="section-title">3.2 — Assignment & Comments</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Assign a task</h4><p>While creating: press <code>+</code> and type a name. On existing tasks: hover → assignee icon → select from dropdown.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Comments & @mentions</h4><p>Click the speech bubble on any task. Type <code>@name</code> to notify. Attach files or links to keep context in one place.</p></div></div>
+    </div>
+    <h2 class="section-title">3.3 — Integrations</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Email to task</h4><p>Forward emails to your Todoist inbox address to create tasks automatically.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Calendar sync</h4><p>Connect Google Calendar or Outlook. Settings → Integrations → Calendar.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Slack</h4><p>Create tasks from Slack messages and receive Todoist notifications in channels.</p></div></div>
+    </div>
+    <div class="tip-box"><strong>Try it hands-on</strong><p>Use Demo 2 to walk through workspace setup and team collaboration live.</p></div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('demo-2')"><span class="lesson-num">▶</span><h4>Demo 2 — Team & Workspace Setup</h4><span class="lesson-type demo">Interactive Demo</span></div>
+      <div class="lesson-item" onclick="show('m4')"><span class="lesson-num">→</span><h4>Next: Module 4 — Advanced</h4></div>
+    </div>
+  </section>
+
+  <!-- MODULE 4 -->
+  <section id="m4" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 4</div>
+      <h1>Advanced & Best Practices</h1>
+      <p>Workflow design, templates, productivity tracking, and troubleshooting.</p>
+    </div>
+    <h2 class="section-title">4.1 — Workflow Design</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Start with real workflows</h4><p>Map out 3–4 recurring workflows your team actually does (e.g., client onboarding, sprint planning, content publishing) and model each as a project template.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Project templates</h4><p>Build a model project, then duplicate it for new initiatives. Browse ready-made templates at <a href="https://todoist.com/templates" target="_blank" style="color:var(--red)">todoist.com/templates</a>.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Naming conventions</h4><p>Agree team-wide on naming for projects, labels, and sections. Consistency makes filters much more powerful.</p></div></div>
+    </div>
+    <h2 class="section-title">4.2 — Reporting & Tracking</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Reporting (Activity Log)</h4><p>Shows all completed tasks across the workspace. Filter by user, project, and date. Use it to spot adoption gaps or track output.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Karma</h4><p>Tracks personal task completion streaks. Optional but useful as a motivator for individuals during onboarding.</p></div></div>
+    </div>
+    <h2 class="section-title">4.3 — Troubleshooting</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Common issues</h4><ul><li>Tasks not syncing: close and reopen the app, check connection</li><li>Missing tasks: check Reporting — tasks may be completed, not deleted</li><li>Notification overload: adjust per-project notification settings</li></ul></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Where to get help</h4><p><a href="https://todoist.com/help" target="_blank" style="color:var(--red)">Help Center</a> · <a href="https://todoist.com/contact" target="_blank" style="color:var(--red)">Contact support</a></p></div></div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('trainer')"><span class="lesson-num">→</span><h4>Next: Train the Trainer</h4></div>
+    </div>
+  </section>
+
+  <!-- TRAIN THE TRAINER -->
+  <section id="trainer" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Train the Trainer</div>
+      <h1>Running Training Sessions</h1>
+      <p>Everything you need to deliver effective onboarding for your team.</p>
+    </div>
+    <div class="tip-box"><strong>Trainer tip</strong><p>The best sessions are hands-on. Use the Interactive Demos as live walkthroughs — let participants click through them on their own screens.</p></div>
+    <h2 class="section-title">How to run your first session</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Set up before the session</h4><p>Create a shared "Training" project in the workspace as a sandbox for practice.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Share the onboarding guide in advance</h4><p>Send the PDF (Resources section) 24h before. Ask participants to create an account and join the workspace first.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Walk through the demos live</h4><p>Use Demo 1 for team member sessions. Demo 2 for admin/Champion onboarding. Let participants follow on their own screens.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><h4>Focus on 3–4 core workflows</h4><p>Don't try to cover everything. Tailor to what your team will actually use daily. Depth over breadth.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><h4>End with a real task</h4><p>Ask everyone to add one real work task in Todoist before the session closes. Nothing reinforces training like doing it for real.</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-content"><h4>Schedule a follow-up</h4><p>A 30-minute check-in 1 week later makes a big difference. Adoption drops without a follow-up touchpoint.</p></div></div>
+    </div>
+    <h2 class="section-title">Session formats</h2>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">⚡</div><h3>Quick Start (30 min)</h3><p>Account setup, adding tasks, joining the workspace. Best for time-constrained teams.</p><span class="badge">Beginner</span></div>
+      <div class="card"><div class="card-icon">🎯</div><h3>Core Training (90 min)</h3><p>Full feature overview with hands-on practice. Tasks, projects, collaboration, filters.</p><span class="badge">Standard</span></div>
+      <div class="card"><div class="card-icon">🏋️</div><h3>Deep Dive (half day)</h3><p>For Champions and admins. Workflow design, templates, integrations.</p><span class="badge">Advanced</span></div>
+    </div>
+  </section>
+
+  <!-- DEMO 1 -->
+  <section id="demo-1" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Demo 1</div>
+      <h1>Onboarding Walkthrough</h1>
+      <p>Use this in your Quick Start and Core Training sessions. Let participants follow along on their own screens.</p>
+    </div>
+    <div class="tip-box"><strong>How to use</strong><p>Click through each step below. If the embed doesn't load, use the "Open in new tab" button and share the link with your team.</p></div>
+    <div class="demo-container">
+      <div class="demo-header">
+        <h3>Demo 1 — Todoist Onboarding Walkthrough</h3>
+        <div class="demo-actions">
+          <span class="demo-tag">Interactive</span>
+          <a class="demo-open-btn" href="https://app.arcade.software/flows/F8Ru2ezYKFhC2d6WqwsY/view" target="_blank">Open in new tab ↗</a>
+        </div>
+      </div>
+      <div class="demo-embed-wrapper">
+        <iframe src="https://demo.arcade.software/F8Ru2ezYKFhC2d6WqwsY?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Todoist Onboarding" allow="clipboard-write" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('demo-2')"><span class="lesson-num">→</span><h4>Next: Demo 2 — Team & Workspace Setup</h4></div>
+    </div>
+  </section>
+
+  <!-- DEMO 2 -->
+  <section id="demo-2" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Demo 2</div>
+      <h1>Team & Workspace Setup</h1>
+      <p>Use this when onboarding admins or walking Champions through workspace configuration.</p>
+    </div>
+    <div class="tip-box"><strong>How to use</strong><p>Click through each step below. If the embed doesn't load, use the "Open in new tab" button and share the link with your team.</p></div>
+    <div class="demo-container">
+      <div class="demo-header">
+        <h3>Demo 2 — Team & Workspace Setup</h3>
+        <div class="demo-actions">
+          <span class="demo-tag">Interactive</span>
+          <a class="demo-open-btn" href="https://app.arcade.software/flows/66JvkcM4F6A4ga8tO6hQ/view" target="_blank">Open in new tab ↗</a>
+        </div>
+      </div>
+      <div class="demo-embed-wrapper">
+        <iframe src="https://demo.arcade.software/66JvkcM4F6A4ga8tO6hQ?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Todoist Team Setup" allow="clipboard-write" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('resources')"><span class="lesson-num">→</span><h4>Next: Resources & Downloads</h4></div>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section id="resources" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Resources</div>
+      <h1>Downloads & Links</h1>
+    </div>
+    <h2 class="section-title">Documents</h2>
+    <div class="resource-list">
+      <a class="resource-item" href="./Todoist Onboarding.pdf" target="_blank">
+        <span class="res-icon">📄</span>
+        <div class="res-info"><h4>Todoist for Teams — Onboarding Guide</h4><p>Share this with team members before their first training session.</p></div>
+        <span class="res-action">Open PDF →</span>
+      </a>
+    </div>
+    <h2 class="section-title">Interactive Demos</h2>
+    <div class="resource-list">
+      <div class="resource-item" onclick="show('demo-1')"><span class="res-icon">▶️</span><div class="res-info"><h4>Demo 1 — Onboarding Walkthrough</h4><p>For Quick Start and Core Training sessions.</p></div><span class="res-action">View →</span></div>
+      <div class="resource-item" onclick="show('demo-2')"><span class="res-icon">▶️</span><div class="res-info"><h4>Demo 2 — Team & Workspace Setup</h4><p>For admin and Champion onboarding.</p></div><span class="res-action">View →</span></div>
+    </div>
+    <h2 class="section-title">Official Todoist</h2>
+    <div class="resource-list">
+      <a class="resource-item" href="https://todoist.com/help" target="_blank"><span class="res-icon">📚</span><div class="res-info"><h4>Help Center</h4><p>Official documentation for all features.</p></div><span class="res-action">Open →</span></a>
+      <a class="resource-item" href="https://todoist.com/templates" target="_blank"><span class="res-icon">🗂️</span><div class="res-info"><h4>Project Templates</h4><p>Ready-made templates for team workflows.</p></div><span class="res-action">Open →</span></a>
+      <a class="resource-item" href="https://todoist.com/integrations" target="_blank"><span class="res-icon">🔌</span><div class="res-info"><h4>Integrations</h4><p>Connect Todoist with your existing tools.</p></div><span class="res-action">Open →</span></a>
+    </div>
+  </section>
+
+</main>
+<script>
+  function show(id) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    const t = document.getElementById(id);
+    if (t) t.classList.add('active');
+    document.querySelectorAll('#sidebar nav a').forEach(a => {
+      a.classList.remove('active');
+      if ((a.getAttribute('onclick') || '').includes("'" + id + "'")) a.classList.add('active');
+    });
+    window.scrollTo(0, 0);
+    return false;
+  }
+</script>
+</body>
+</html>
