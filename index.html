@@ -570,7 +570,7 @@
     <div class="prac-right">
       <div class="prac-right-header">
         <button class="prac-rtab active" id="rtab-steps" onclick="switchPracTab('steps')">Exercise</button>
-        <button class="prac-rtab" id="rtab-todoist" onclick="switchPracTab('todoist')">Todoist</button>
+        <button class="prac-rtab" id="rtab-todoist" onclick="switchPracTab('todoist')">Create a filter</button>
       </div>
 
       <!-- Exercise tab -->
@@ -582,31 +582,15 @@
         </div>
       </div>
 
-      <!-- Todoist tab -->
+      <!-- Create a filter demo tab -->
       <div id="prac-todoist-tab" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
-        <iframe id="prac-todoist-frame"
-          src="about:blank"
-          allow="clipboard-read; clipboard-write; cross-origin-isolated"
-          referrerpolicy="no-referrer"
-          style="flex:1; border:none; width:100%; display:block;"
-          title="Todoist">
+        <iframe
+          src="https://demo.arcade.software/66JvkcM4F6A4ga8tO6hQ?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
+          title="Create a filter"
+          allow="clipboard-write"
+          allowfullscreen
+          style="flex:1; border:none; width:100%; display:block;">
         </iframe>
-        <div id="prac-todoist-fallback" style="display:none; flex:1; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding:40px; text-align:center;">
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <div>
-            <p style="font-size:15px;font-weight:700;color:#202020;margin-bottom:6px;">Todoist can't be embedded</p>
-            <p style="font-size:13px;color:#777;line-height:1.6;max-width:340px;">Todoist blocks iframe embedding for security reasons. Use one of these options to practice alongside the portal:</p>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px;">
-            <button onclick="openTodoistCompanion()" style="padding:11px 20px;background:var(--red);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
-              Open as companion window ↗
-            </button>
-            <a href="https://app.todoist.com" target="_blank" style="padding:11px 20px;background:var(--gray-light);color:var(--gray-dark);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;display:block;">
-              Open in new tab ↗
-            </a>
-          </div>
-          <p style="font-size:11px;color:#aaa;max-width:300px;line-height:1.5;">Tip: the companion window opens sized to fill the right half of your screen — snap this portal to the left and Todoist to the right.</p>
-        </div>
       </div>
     </div>
 
@@ -693,51 +677,11 @@
     ]
   };
 
-  var pracCurrentTab = 'steps';
-
   function switchPracTab(tab) {
-    pracCurrentTab = tab;
     document.getElementById('rtab-steps').classList.toggle('active', tab === 'steps');
     document.getElementById('rtab-todoist').classList.toggle('active', tab === 'todoist');
-    var stepsEl = document.getElementById('prac-right-body');
-    var todoistEl = document.getElementById('prac-todoist-tab');
-    if (tab === 'steps') {
-      stepsEl.style.display = 'block';
-      todoistEl.style.display = 'none';
-    } else {
-      stepsEl.style.display = 'none';
-      todoistEl.style.display = 'flex';
-      loadTodoistFrame();
-    }
-  }
-
-  var todoistLoaded = false;
-  function loadTodoistFrame() {
-    if (todoistLoaded) return;
-    todoistLoaded = true;
-    var frame = document.getElementById('prac-todoist-frame');
-    var fallback = document.getElementById('prac-todoist-fallback');
-    frame.src = 'https://app.todoist.com';
-    frame.onerror = function() { frame.style.display = 'none'; fallback.style.display = 'flex'; };
-    frame.onload = function() {
-      try {
-        var doc = frame.contentDocument || frame.contentWindow.document;
-        if (!doc || !doc.body || doc.body.innerHTML === '') { frame.style.display = 'none'; fallback.style.display = 'flex'; }
-      } catch(e) {
-        // Cross-origin block — show fallback
-        frame.style.display = 'none'; fallback.style.display = 'flex';
-      }
-    };
-  }
-
-  function openTodoistCompanion() {
-    var sw = window.screen.availWidth;
-    var sh = window.screen.availHeight;
-    var w = Math.round(sw * 0.5);
-    var left = sw - w;
-    var win = window.open('https://app.todoist.com', 'todoist_companion',
-      'width=' + w + ',height=' + sh + ',left=' + left + ',top=0,resizable=yes,scrollbars=yes');
-    if (!win) alert('Please allow pop-ups for this page to use the companion window.');
+    document.getElementById('prac-right-body').style.display = tab === 'steps' ? 'block' : 'none';
+    document.getElementById('prac-todoist-tab').style.display = tab === 'todoist' ? 'flex' : 'none';
   }
 
   function openPracArticle(el, title, url) {
@@ -771,7 +715,7 @@
     });
     html += '<div class="prac-done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Exercise complete — great work!</div></div>';
     document.getElementById('prac-right-body').innerHTML = html;
-    if (pracCurrentTab !== 'steps') switchPracTab('steps');
+    switchPracTab('steps');
   }
 
   function closePracArticle() {
