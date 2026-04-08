@@ -99,13 +99,21 @@
     .article-info { flex: 1; min-width: 0; }
     .article-info h4 { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .article-views { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
-    .eng-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
-    .eng-green  { background: #E6F4EA; color: #1E8E3E; }
-    .eng-yellow { background: #FFF8E1; color: #B06C00; }
-    .eng-orange { background: #FFF3E0; color: #E65100; }
-    .eng-red    { background: #FDECEA; color: #C5221F; }
-    .eng-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-    .eng-legend span { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+    .hc-panel { position: fixed; top: 0; right: -700px; width: 700px; max-width: 100vw; height: 100vh; background: var(--white); box-shadow: -4px 0 32px rgba(0,0,0,0.15); z-index: 200; display: flex; flex-direction: column; transition: right 0.25s ease; }
+    .hc-panel.open { right: 0; }
+    .hc-panel-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--gray-border); flex-shrink: 0; }
+    .hc-panel-title { font-size: 14px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hc-panel-newtab { font-size: 12px; font-weight: 600; color: var(--red); text-decoration: none; border: 1px solid var(--red); padding: 4px 12px; border-radius: 6px; white-space: nowrap; }
+    .hc-panel-newtab:hover { background: var(--red-light); }
+    .hc-panel-close { font-size: 18px; color: var(--gray-mid); cursor: pointer; background: none; border: none; padding: 4px 8px; line-height: 1; }
+    .hc-panel-close:hover { color: var(--gray-dark); }
+    .hc-panel iframe { flex: 1; border: none; width: 100%; }
+    .hc-panel-blocked { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px; text-align: center; }
+    .hc-panel-blocked p { font-size: 14px; color: var(--gray-mid); line-height: 1.6; }
+    .hc-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 199; }
+    .hc-overlay.open { display: block; }
+    .article-item { cursor: pointer; }
+    .article-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); border-color: var(--red); }
   </style>
 </head>
 <body>
@@ -397,83 +405,116 @@
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Resources</div>
       <h1>Help Center Insights</h1>
-      <p>The 10 most-visited Help Center articles and their engagement rates. Use this to anticipate where your team will have questions.</p>
-    </div>
-
-    <div class="tip-box">
-      <strong>What is engagement rate?</strong>
-      <p>Engagement measures how deeply readers interact with an article relative to its view count. A rate above 100% means readers are scrolling, re-reading, or sharing — a sign the content is genuinely useful.</p>
-    </div>
-
-    <div class="eng-legend">
-      <span class="eng-badge eng-green">✅ Strong (≥ 98%)</span>
-      <span class="eng-badge eng-yellow">🔶 Moderate (70–97%)</span>
-      <span class="eng-badge eng-orange">⚠️ Low (50–69%)</span>
-      <span class="eng-badge eng-red">🔴 Very low (&lt; 50%)</span>
+      <p>The 10 most-visited Help Center articles. Click any article to read it here in the portal.</p>
     </div>
 
     <h2 class="section-title">Top 10 most-read articles</h2>
     <div class="article-list">
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Use The Calendar Integration','https://www.todoist.com/help/articles/use-the-calendar-integration-rCqwLCt3G')">
         <span class="article-rank top3">1</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/use-the-calendar-integration-rCqwLCt3G" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Use The Calendar Integration</a></h4><div class="article-views">36,391 views</div></div>
-        <span class="eng-badge eng-orange">⚠️ 60</span>
+        <div class="article-info"><h4>Use The Calendar Integration</h4><div class="article-views">36,391 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Introduction To Filters','https://www.todoist.com/help/articles/introduction-to-filters-V98wIH')">
         <span class="article-rank top3">2</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/introduction-to-filters-V98wIH" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Introduction To Filters</a></h4><div class="article-views">22,309 views</div></div>
-        <span class="eng-badge eng-green">✅ 126</span>
+        <div class="article-info"><h4>Introduction To Filters</h4><div class="article-views">22,309 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Get Started With Todoist','https://www.todoist.com/help/articles/get-started-with-todoist-OgNNJR')">
         <span class="article-rank top3">3</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/get-started-with-todoist-OgNNJR" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Get Started With Todoist</a></h4><div class="article-views">13,124 views</div></div>
-        <span class="eng-badge eng-green">✅ 127</span>
+        <div class="article-info"><h4>Get Started With Todoist</h4><div class="article-views">13,124 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Forward Emails To Todoist','https://www.todoist.com/help/articles/forward-emails-to-todoist-JPJ1V339')">
         <span class="article-rank">4</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/forward-emails-to-todoist-JPJ1V339" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Forward Emails To Todoist</a></h4><div class="article-views">12,401 views</div></div>
-        <span class="eng-badge eng-green">✅ 98</span>
+        <div class="article-info"><h4>Forward Emails To Todoist</h4><div class="article-views">12,401 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Use The Inbox In Todoist','https://www.todoist.com/help/articles/use-the-inbox-in-todoist-HwHvYErS')">
         <span class="article-rank">5</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/use-the-inbox-in-todoist-HwHvYErS" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Use The Inbox In Todoist</a></h4><div class="article-views">10,231 views</div></div>
-        <span class="eng-badge eng-green">✅ 88</span>
+        <div class="article-info"><h4>Use The Inbox In Todoist</h4><div class="article-views">10,231 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Usage Limits In Todoist','https://www.todoist.com/help/articles/usage-limits-in-todoist-e5rcSY')">
         <span class="article-rank">6</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/usage-limits-in-todoist-e5rcSY" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Usage Limits In Todoist</a></h4><div class="article-views">9,688 views</div></div>
-        <span class="eng-badge eng-yellow">🔶 76</span>
+        <div class="article-info"><h4>Usage Limits In Todoist</h4><div class="article-views">9,688 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Dictate To Add Tasks With Ramble','https://www.todoist.com/help/articles/dictate-to-add-tasks-with-ramble-P1Raq7vVF')">
         <span class="article-rank">7</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/dictate-to-add-tasks-with-ramble-P1Raq7vVF" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Dictate To Add Tasks With Ramble</a></h4><div class="article-views">9,491 views</div></div>
-        <span class="eng-badge eng-green">✅ 101</span>
+        <div class="article-info"><h4>Dictate To Add Tasks With Ramble</h4><div class="article-views">9,491 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Customize Views In Todoist','https://www.todoist.com/help/articles/customize-views-in-todoist-AoHhBxFdZ')">
         <span class="article-rank">8</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/customize-views-in-todoist-AoHhBxFdZ" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Customize Views In Todoist</a></h4><div class="article-views">9,138 views</div></div>
-        <span class="eng-badge eng-orange">⚠️ 58</span>
+        <div class="article-info"><h4>Customize Views In Todoist</h4><div class="article-views">9,138 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Introduction To Projects','https://www.todoist.com/help/articles/introduction-to-projects-TLTjNftLM')">
         <span class="article-rank">9</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/introduction-to-projects-TLTjNftLM" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Introduction To Projects</a></h4><div class="article-views">8,873 views</div></div>
-        <span class="eng-badge eng-red">🔴 37</span>
+        <div class="article-info"><h4>Introduction To Projects</h4><div class="article-views">8,873 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
-      <div class="article-item">
+      <div class="article-item" onclick="openHC('Changelog Entries From 2026','https://www.todoist.com/help/articles/changelog-entries-from-2026-HD3jJAtLd')">
         <span class="article-rank">10</span>
-        <div class="article-info"><h4><a href="https://www.todoist.com/help/articles/changelog-entries-from-2026-HD3jJAtLd" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-border)">Changelog Entries From 2026</a></h4><div class="article-views">8,316 views</div></div>
-        <span class="eng-badge eng-red">🔴 38</span>
+        <div class="article-info"><h4>Changelog Entries From 2026</h4><div class="article-views">8,316 views</div></div>
+        <span class="res-action">Read →</span>
       </div>
     </div>
 
-    <div class="tip-box">
-      <strong>Champion action</strong>
-      <p>Articles with low engagement (⚠️ and 🔴) are being found but not absorbed — consider covering these topics live in training sessions to close the comprehension gap. Calendar Integration and Customize Views in particular have very high traffic but low engagement.</p>
-    </div>
   </section>
+
+
+  <!-- HC ARTICLE PANEL -->
+  <div class="hc-overlay" id="hc-overlay" onclick="closeHC()"></div>
+  <div class="hc-panel" id="hc-panel">
+    <div class="hc-panel-header">
+      <span class="hc-panel-title" id="hc-panel-title"></span>
+      <a class="hc-panel-newtab" id="hc-panel-newtab" href="#" target="_blank">Open in new tab ↗</a>
+      <button class="hc-panel-close" onclick="closeHC()">✕</button>
+    </div>
+    <iframe id="hc-iframe" src="" title="Help Center Article"></iframe>
+    <div class="hc-panel-blocked" id="hc-panel-blocked" style="display:none">
+      <p>This article can't be displayed inside the portal due to browser security restrictions.</p>
+      <a class="demo-open-btn" id="hc-blocked-link" href="#" target="_blank">Open in new tab ↗</a>
+    </div>
+  </div>
 
 </main>
 <script>
+  function openHC(title, url) {
+    document.getElementById('hc-panel-title').textContent = title;
+    document.getElementById('hc-panel-newtab').href = url;
+    document.getElementById('hc-blocked-link').href = url;
+    var iframe = document.getElementById('hc-iframe');
+    var blocked = document.getElementById('hc-panel-blocked');
+    iframe.style.display = 'block';
+    blocked.style.display = 'none';
+    iframe.src = url;
+    iframe.onerror = function() {
+      iframe.style.display = 'none';
+      blocked.style.display = 'flex';
+    };
+    // Detect X-Frame-Options block (fires load but with empty content on some browsers)
+    iframe.onload = function() {
+      try {
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || doc.body === null || doc.body.innerHTML === '') {
+          iframe.style.display = 'none';
+          blocked.style.display = 'flex';
+        }
+      } catch(e) {
+        // Cross-origin — assume it loaded fine, browser will show its own error
+      }
+    };
+    document.getElementById('hc-panel').classList.add('open');
+    document.getElementById('hc-overlay').classList.add('open');
+  }
+  function closeHC() {
+    document.getElementById('hc-panel').classList.remove('open');
+    document.getElementById('hc-overlay').classList.remove('open');
+    document.getElementById('hc-iframe').src = '';
+  }
   function show(id) {
     document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
     const t = document.getElementById(id);
