@@ -95,10 +95,8 @@
     .article-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
     .article-item { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--gray-border); border-radius: 10px; padding: 14px 18px; }
     .article-rank { font-size: 13px; font-weight: 700; color: var(--gray-mid); width: 22px; text-align: right; flex-shrink: 0; }
-    .article-rank.top3 { color: var(--red); }
     .article-info { flex: 1; min-width: 0; }
     .article-info h4 { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .article-views { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
     .hc-panel { position: fixed; top: 0; right: -700px; width: 700px; max-width: 100vw; height: 100vh; background: var(--white); box-shadow: -4px 0 32px rgba(0,0,0,0.15); z-index: 200; display: flex; flex-direction: column; transition: right 0.25s ease; }
     .hc-panel.open { right: 0; }
     .hc-panel-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--gray-border); flex-shrink: 0; }
@@ -411,53 +409,53 @@
     <h2 class="section-title">Top 10 most-read articles</h2>
     <div class="article-list">
       <div class="article-item" onclick="openHC('Use The Calendar Integration','https://www.todoist.com/help/articles/use-the-calendar-integration-rCqwLCt3G')">
-        <span class="article-rank top3">1</span>
-        <div class="article-info"><h4>Use The Calendar Integration</h4><div class="article-views">36,391 views</div></div>
+        <span class="article-rank">1</span>
+        <div class="article-info"><h4>Use The Calendar Integration</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Introduction To Filters','https://www.todoist.com/help/articles/introduction-to-filters-V98wIH')">
-        <span class="article-rank top3">2</span>
-        <div class="article-info"><h4>Introduction To Filters</h4><div class="article-views">22,309 views</div></div>
+        <span class="article-rank">2</span>
+        <div class="article-info"><h4>Introduction To Filters</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Get Started With Todoist','https://www.todoist.com/help/articles/get-started-with-todoist-OgNNJR')">
-        <span class="article-rank top3">3</span>
-        <div class="article-info"><h4>Get Started With Todoist</h4><div class="article-views">13,124 views</div></div>
+        <span class="article-rank">3</span>
+        <div class="article-info"><h4>Get Started With Todoist</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Forward Emails To Todoist','https://www.todoist.com/help/articles/forward-emails-to-todoist-JPJ1V339')">
         <span class="article-rank">4</span>
-        <div class="article-info"><h4>Forward Emails To Todoist</h4><div class="article-views">12,401 views</div></div>
+        <div class="article-info"><h4>Forward Emails To Todoist</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Use The Inbox In Todoist','https://www.todoist.com/help/articles/use-the-inbox-in-todoist-HwHvYErS')">
         <span class="article-rank">5</span>
-        <div class="article-info"><h4>Use The Inbox In Todoist</h4><div class="article-views">10,231 views</div></div>
+        <div class="article-info"><h4>Use The Inbox In Todoist</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Usage Limits In Todoist','https://www.todoist.com/help/articles/usage-limits-in-todoist-e5rcSY')">
         <span class="article-rank">6</span>
-        <div class="article-info"><h4>Usage Limits In Todoist</h4><div class="article-views">9,688 views</div></div>
+        <div class="article-info"><h4>Usage Limits In Todoist</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Dictate To Add Tasks With Ramble','https://www.todoist.com/help/articles/dictate-to-add-tasks-with-ramble-P1Raq7vVF')">
         <span class="article-rank">7</span>
-        <div class="article-info"><h4>Dictate To Add Tasks With Ramble</h4><div class="article-views">9,491 views</div></div>
+        <div class="article-info"><h4>Dictate To Add Tasks With Ramble</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Customize Views In Todoist','https://www.todoist.com/help/articles/customize-views-in-todoist-AoHhBxFdZ')">
         <span class="article-rank">8</span>
-        <div class="article-info"><h4>Customize Views In Todoist</h4><div class="article-views">9,138 views</div></div>
+        <div class="article-info"><h4>Customize Views In Todoist</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Introduction To Projects','https://www.todoist.com/help/articles/introduction-to-projects-TLTjNftLM')">
         <span class="article-rank">9</span>
-        <div class="article-info"><h4>Introduction To Projects</h4><div class="article-views">8,873 views</div></div>
+        <div class="article-info"><h4>Introduction To Projects</h4></div>
         <span class="res-action">Read →</span>
       </div>
       <div class="article-item" onclick="openHC('Changelog Entries From 2026','https://www.todoist.com/help/articles/changelog-entries-from-2026-HD3jJAtLd')">
         <span class="article-rank">10</span>
-        <div class="article-info"><h4>Changelog Entries From 2026</h4><div class="article-views">8,316 views</div></div>
+        <div class="article-info"><h4>Changelog Entries From 2026</h4></div>
         <span class="res-action">Read →</span>
       </div>
     </div>
