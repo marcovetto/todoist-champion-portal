@@ -116,10 +116,10 @@
     .prac-blocked-article { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px; text-align: center; }
     .prac-blocked-article p { font-size: 13px; color: var(--gray-mid); line-height: 1.6; }
     .prac-right { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--white); }
-    .prac-right-header { padding: 12px 20px; background: var(--gray-dark); color: white; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-    .prac-right-header span { font-size: 14px; font-weight: 600; flex: 1; }
-    .prac-open-todoist { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: var(--red); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600; white-space: nowrap; transition: background 0.15s; }
-    .prac-open-todoist:hover { background: var(--red-dark); }
+    .prac-right-header { display: flex; align-items: center; gap: 2px; padding: 0 16px; background: var(--gray-dark); flex-shrink: 0; }
+    .prac-rtab { padding: 12px 18px; background: none; border: none; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.45); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; }
+    .prac-rtab:hover { color: rgba(255,255,255,0.75); }
+    .prac-rtab.active { color: white; border-bottom-color: var(--red); }
     .prac-right-body { flex: 1; overflow-y: auto; }
     .prac-welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; padding: 40px; text-align: center; }
     .prac-welcome .prac-welcome-icon { font-size: 40px; }
@@ -514,7 +514,7 @@
     <div class="prac-left">
       <div class="prac-header">
         <h2>Practice Mode</h2>
-        <p>Seleziona un articolo per leggerlo qui a sinistra mentre pratichi in Todoist a destra.</p>
+        <p>Select an article to read it here, then follow the guided steps in Todoist.</p>
       </div>
 
       <!-- List view -->
@@ -554,32 +554,58 @@
       <!-- Article view (replaces list when article is selected) -->
       <div class="prac-article-view" id="prac-article-view">
         <div class="prac-article-topbar">
-          <button class="prac-back" onclick="closePracArticle()">← Lista</button>
+          <button class="prac-back" onclick="closePracArticle()">← Back</button>
           <span class="prac-article-name" id="prac-article-name"></span>
-          <a class="prac-newtab" id="prac-newtab" href="#" target="_blank">↗ Nuova tab</a>
+          <a class="prac-newtab" id="prac-newtab" href="#" target="_blank">↗ New tab</a>
         </div>
         <iframe class="prac-article-frame" id="prac-article-frame" src="" title="HC Article"></iframe>
         <div class="prac-blocked-article" id="prac-blocked-article" style="display:none">
-          <p>Questo articolo non può essere incorporato per restrizioni di sicurezza del browser.</p>
-          <a class="demo-open-btn" id="prac-blocked-link" href="#" target="_blank">Apri articolo ↗</a>
+          <p>This article can't be displayed due to browser security restrictions.</p>
+          <a class="demo-open-btn" id="prac-blocked-link" href="#" target="_blank">Open article ↗</a>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: guided steps + Todoist button -->
+    <!-- RIGHT: tabs — Exercise steps | Todoist -->
     <div class="prac-right">
       <div class="prac-right-header">
-        <span>Esercizio guidato</span>
-        <a class="prac-open-todoist" href="https://app.todoist.com" target="_blank">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14l-4-4 1.41-1.41L11 13.17l6.59-6.59L19 8l-8 8z"/></svg>
-          Apri Todoist ↗
-        </a>
+        <button class="prac-rtab active" id="rtab-steps" onclick="switchPracTab('steps')">Exercise</button>
+        <button class="prac-rtab" id="rtab-todoist" onclick="switchPracTab('todoist')">Todoist</button>
       </div>
+
+      <!-- Exercise tab -->
       <div class="prac-right-body" id="prac-right-body">
         <div class="prac-welcome">
           <div class="prac-welcome-icon">👈</div>
-          <h3>Seleziona un articolo</h3>
-          <p>Scegli un articolo dalla lista a sinistra per vedere i passaggi dell'esercizio e praticarlo nel tuo account Todoist.</p>
+          <h3>Select an article</h3>
+          <p>Choose an article from the list on the left to see the guided exercise steps.</p>
+        </div>
+      </div>
+
+      <!-- Todoist tab -->
+      <div id="prac-todoist-tab" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
+        <iframe id="prac-todoist-frame"
+          src="about:blank"
+          allow="clipboard-read; clipboard-write; cross-origin-isolated"
+          referrerpolicy="no-referrer"
+          style="flex:1; border:none; width:100%; display:block;"
+          title="Todoist">
+        </iframe>
+        <div id="prac-todoist-fallback" style="display:none; flex:1; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding:40px; text-align:center;">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <div>
+            <p style="font-size:15px;font-weight:700;color:#202020;margin-bottom:6px;">Todoist can't be embedded</p>
+            <p style="font-size:13px;color:#777;line-height:1.6;max-width:340px;">Todoist blocks iframe embedding for security reasons. Use one of these options to practice alongside the portal:</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px;">
+            <button onclick="openTodoistCompanion()" style="padding:11px 20px;background:var(--red);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+              Open as companion window ↗
+            </button>
+            <a href="https://app.todoist.com" target="_blank" style="padding:11px 20px;background:var(--gray-light);color:var(--gray-dark);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;display:block;">
+              Open in new tab ↗
+            </a>
+          </div>
+          <p style="font-size:11px;color:#aaa;max-width:300px;line-height:1.5;">Tip: the companion window opens sized to fill the right half of your screen — snap this portal to the left and Todoist to the right.</p>
         </div>
       </div>
     </div>
@@ -606,66 +632,113 @@
   // Practice Mode — steps data
   var pracSteps = {
     'Use The Calendar Integration': [
-      { t: 'Apri le impostazioni', d: 'Vai su Impostazioni → Integrazioni → Calendario.' },
-      { t: 'Collega il tuo calendario', d: 'Clicca su "Collega Google Calendar" o "Collega Outlook" e segui il flusso di autorizzazione.' },
-      { t: 'Attiva la sincronizzazione', d: 'Abilita l\'opzione per mostrare i task con scadenza nel calendario.' },
-      { t: 'Verifica', d: 'Crea un task con una data di scadenza e controlla che appaia nel tuo calendario.', tip: 'I task ricorrenti vengono visualizzati come eventi ricorrenti nel calendario.' }
+      { t: 'Open Settings', d: 'Go to Settings → Integrations → Calendar.' },
+      { t: 'Connect your calendar', d: 'Click "Connect Google Calendar" or "Connect Outlook" and complete the authorisation flow.' },
+      { t: 'Enable sync', d: 'Turn on the option to show tasks with due dates in your calendar.' },
+      { t: 'Verify', d: 'Create a task with a due date and check that it appears in your calendar.', tip: 'Recurring tasks show up as recurring events in your calendar.' }
     ],
     'Introduction To Filters': [
-      { t: 'Vai a Filtri & Etichette', d: 'Clicca su "Filtri & Etichette" nella barra laterale sinistra.' },
-      { t: 'Crea un nuovo filtro', d: 'Clicca sul + e dai un nome al filtro, ad esempio "Priorità di oggi".' },
-      { t: 'Inserisci la query', d: 'Usa la query: <code>oggi & p1</code> per vedere solo i task P1 di oggi.' },
-      { t: 'Salva e testa', d: 'Salva il filtro e clicca su di esso per vedere i risultati.', tip: 'Prova anche: <code>assegnato a: me & scaduto</code> per trovare i task in ritardo.' }
+      { t: 'Go to Filters & Labels', d: 'Click "Filters & Labels" in the left sidebar.' },
+      { t: 'Create a new filter', d: 'Click + and give the filter a name, e.g. "Today\'s priorities".' },
+      { t: 'Enter the query', d: 'Use the query: <code>today & p1</code> to see only P1 tasks due today.' },
+      { t: 'Save and test', d: 'Save the filter and click it to see the results.', tip: 'Also try: <code>assigned to: me & overdue</code> to catch overdue tasks.' }
     ],
     'Get Started With Todoist': [
-      { t: 'Aggiungi il tuo primo task', d: 'Premi <code>Q</code> ovunque per aprire Quick Add. Scrivi un task reale del tuo lavoro.' },
-      { t: 'Usa il linguaggio naturale', d: 'Aggiungi una scadenza direttamente nel testo, es: "Chiamata con cliente domani alle 15".' },
-      { t: 'Assegna una priorità', d: 'Digita <code>p1</code> nel testo oppure usa l\'icona della bandiera per impostare la priorità.' },
-      { t: 'Completa il task', d: 'Clicca sul cerchio a sinistra del task per marcarlo come completato. Ottimo lavoro!' }
+      { t: 'Add your first task', d: 'Press <code>Q</code> anywhere to open Quick Add. Type a real task from your work.' },
+      { t: 'Use natural language', d: 'Include a due date directly in the text, e.g. "Client call tomorrow at 3pm".' },
+      { t: 'Set a priority', d: 'Type <code>p1</code> in the text or use the flag icon to set the priority level.' },
+      { t: 'Complete the task', d: 'Click the circle to the left of the task to mark it as complete.' }
     ],
     'Forward Emails To Todoist': [
-      { t: 'Apri un progetto', d: 'Vai in un progetto esistente (o crea un progetto "Email Tasks").' },
-      { t: 'Trova l\'indirizzo email del progetto', d: 'Clicca sui tre puntini ⋯ in alto a destra → "Invia task via email a questo progetto".' },
-      { t: 'Copia l\'indirizzo', d: 'Copia l\'indirizzo email univoco generato da Todoist.' },
-      { t: 'Inoltra una email', d: 'Vai nella tua casella di posta e inoltra una email a quell\'indirizzo. Torna in Todoist e verifica che il task sia apparso.', tip: 'L\'oggetto della email diventa il nome del task.' }
+      { t: 'Open a project', d: 'Go to an existing project (or create a new one called "Email Tasks").' },
+      { t: 'Find the project email address', d: 'Click the three dots ⋯ at the top right → "Email tasks to this project".' },
+      { t: 'Copy the address', d: 'Copy the unique email address generated by Todoist.' },
+      { t: 'Forward an email', d: 'Go to your inbox and forward an email to that address. Return to Todoist and confirm the task appeared.', tip: 'The email subject line becomes the task name.' }
     ],
     'Use The Inbox In Todoist': [
-      { t: 'Aggiungi 3 task alla Inbox', d: 'Premi <code>Q</code> e aggiungi 3 task senza specificare un progetto: finiscono automaticamente nella Inbox.' },
-      { t: 'Apri la Inbox', d: 'Clicca su "Posta in arrivo" nella barra laterale.' },
-      { t: 'Processa i task', d: 'Per ogni task: sposta nel progetto giusto, assegna una scadenza, elimina quelli non necessari.' },
-      { t: 'Svuota la Inbox', d: 'Obiettivo: Inbox a zero. Tutti i task devono avere un posto e una data.', tip: 'Dedica 5-10 minuti al giorno a processare la Inbox.' }
+      { t: 'Add 3 tasks to the Inbox', d: 'Press <code>Q</code> and add 3 tasks without specifying a project — they land in the Inbox automatically.' },
+      { t: 'Open the Inbox', d: 'Click "Inbox" in the left sidebar.' },
+      { t: 'Process your tasks', d: 'For each task: move it to the right project, set a due date, or delete it if it\'s not needed.' },
+      { t: 'Reach Inbox zero', d: 'Goal: empty Inbox. Every task should have a home and a date.', tip: 'Set aside 5–10 minutes each day to process your Inbox.' }
     ],
     'Usage Limits In Todoist': [
-      { t: 'Controlla il tuo piano', d: 'Vai su Impostazioni → Account per vedere il piano attivo e i limiti.' },
-      { t: 'Verifica i progetti attivi', d: 'Conta quanti progetti attivi hai. Il piano Beginner ne permette 5, il Pro 300.' },
-      { t: 'Controlla i collaboratori', d: 'Apri un progetto condiviso e verifica chi sono i collaboratori e i loro ruoli.' },
-      { t: 'Pianifica l\'upgrade', d: 'Se si avvicinano i limiti, valuta il piano Pro o Business per il team.', tip: 'I task completati non contano nel limite dei task attivi.' }
+      { t: 'Check your plan', d: 'Go to Settings → Account to see your active plan and current limits.' },
+      { t: 'Review active projects', d: 'Count how many active projects you have. The Beginner plan allows 5, Pro allows 300.' },
+      { t: 'Check collaborators', d: 'Open a shared project and review who the collaborators are and their roles.' },
+      { t: 'Plan an upgrade if needed', d: 'If you\'re approaching the limits, consider the Pro or Business plan for your team.', tip: 'Completed tasks do not count toward the active task limit.' }
     ],
     'Dictate To Add Tasks With Ramble': [
-      { t: 'Apri Todoist su mobile', d: 'Usa l\'app iOS o Android del tuo dispositivo.' },
-      { t: 'Trova il pulsante Ramble', d: 'Cerca l\'icona microfono nella barra di aggiunta task.' },
-      { t: 'Ditta un task', d: 'Tieni premuto e pronuncia un task completo, ad esempio: "Preparare la presentazione per venerdì prossimo".' },
-      { t: 'Verifica e salva', d: 'Controlla che la data e il progetto siano stati riconosciuti correttamente, poi salva.', tip: 'Puoi specificare anche il progetto: "Aggiungere al progetto Marketing..."' }
+      { t: 'Open Todoist on mobile', d: 'Use the iOS or Android app on your device.' },
+      { t: 'Find the Ramble button', d: 'Look for the microphone icon in the task-add bar.' },
+      { t: 'Dictate a task', d: 'Press and hold, then say a full task, e.g. "Prepare the presentation for next Friday".' },
+      { t: 'Review and save', d: 'Check that the date and project were recognised correctly, then save.', tip: 'You can also specify the project: "Add to the Marketing project..."' }
     ],
     'Customize Views In Todoist': [
-      { t: 'Apri un progetto', d: 'Vai in un progetto con almeno qualche task.' },
-      { t: 'Cambia il layout', d: 'Clicca sul pulsante layout (in alto a destra) e passa da Lista a Bacheca (Kanban).' },
-      { t: 'Raggruppa per priorità', d: 'Nel menù layout, seleziona "Raggruppa per" → Priorità per vedere i task organizzati per urgenza.' },
-      { t: 'Salva la vista', d: 'Le impostazioni della vista vengono salvate per progetto. Prova layout diversi per progetti diversi.', tip: 'La vista Calendario è utile per i progetti con molte scadenze.' }
+      { t: 'Open a project', d: 'Go to a project that has at least a few tasks.' },
+      { t: 'Change the layout', d: 'Click the layout button (top right) and switch from List to Board (Kanban).' },
+      { t: 'Group by priority', d: 'In the layout menu, select "Group by" → Priority to see tasks organised by urgency.' },
+      { t: 'Save the view', d: 'View settings are saved per project. Try different layouts for different projects.', tip: 'The Calendar view is particularly useful for projects with many due dates.' }
     ],
     'Introduction To Projects': [
-      { t: 'Crea un progetto', d: 'Clicca sul + accanto a "I miei progetti" → dai un nome, scegli colore e icona.' },
-      { t: 'Aggiungi sezioni', d: 'Clicca sui tre puntini ⋯ → "Aggiungi sezione". Crea: "Da fare", "In corso", "Completato".' },
-      { t: 'Aggiungi task alle sezioni', d: 'Aggiungi almeno un task in ogni sezione usando il + sotto al nome della sezione.' },
-      { t: 'Condividi il progetto', d: 'Clicca sull\'icona di condivisione (in alto a destra) e invita un collega via email.', tip: 'Puoi duplicare un progetto ben strutturato come template per future iniziative.' }
+      { t: 'Create a project', d: 'Click + next to "My Projects" → give it a name, choose a colour and icon.' },
+      { t: 'Add sections', d: 'Click the three dots ⋯ → "Add section". Create: "To Do", "In Progress", "Done".' },
+      { t: 'Add tasks to sections', d: 'Add at least one task per section using the + below each section name.' },
+      { t: 'Share the project', d: 'Click the share icon (top right) and invite a colleague by email.', tip: 'You can duplicate a well-structured project to use it as a template for future initiatives.' }
     ],
     'Changelog Entries From 2026': [
-      { t: 'Leggi le ultime voci', d: 'Scorri il changelog e leggi le ultime 5 voci per capire le novità recenti.' },
-      { t: 'Identifica funzionalità rilevanti', d: 'Segna le funzionalità che potrebbero essere utili per il tuo team.' },
-      { t: 'Crea un task di follow-up', d: 'Premi <code>Q</code> e crea un task del tipo "Presentare al team la nuova funzionalità X — venerdì".' },
-      { t: 'Condividi con il team', d: 'Copia il link di un\'entry e condividila nel canale Slack o email del team.', tip: 'Tenere il team aggiornato sulle novità è parte del ruolo di Champion.' }
+      { t: 'Read the latest entries', d: 'Scroll through the changelog and read the last 5 entries to understand recent changes.' },
+      { t: 'Identify relevant features', d: 'Note any features that could be useful for your team.' },
+      { t: 'Create a follow-up task', d: 'Press <code>Q</code> and create a task like "Share new feature X with the team — Friday".' },
+      { t: 'Share with your team', d: 'Copy the link to an entry and share it in your team\'s Slack channel or email.', tip: 'Keeping your team informed about new features is part of the Champion role.' }
     ]
   };
+
+  var pracCurrentTab = 'steps';
+
+  function switchPracTab(tab) {
+    pracCurrentTab = tab;
+    document.getElementById('rtab-steps').classList.toggle('active', tab === 'steps');
+    document.getElementById('rtab-todoist').classList.toggle('active', tab === 'todoist');
+    var stepsEl = document.getElementById('prac-right-body');
+    var todoistEl = document.getElementById('prac-todoist-tab');
+    if (tab === 'steps') {
+      stepsEl.style.display = 'block';
+      todoistEl.style.display = 'none';
+    } else {
+      stepsEl.style.display = 'none';
+      todoistEl.style.display = 'flex';
+      loadTodoistFrame();
+    }
+  }
+
+  var todoistLoaded = false;
+  function loadTodoistFrame() {
+    if (todoistLoaded) return;
+    todoistLoaded = true;
+    var frame = document.getElementById('prac-todoist-frame');
+    var fallback = document.getElementById('prac-todoist-fallback');
+    frame.src = 'https://app.todoist.com';
+    frame.onerror = function() { frame.style.display = 'none'; fallback.style.display = 'flex'; };
+    frame.onload = function() {
+      try {
+        var doc = frame.contentDocument || frame.contentWindow.document;
+        if (!doc || !doc.body || doc.body.innerHTML === '') { frame.style.display = 'none'; fallback.style.display = 'flex'; }
+      } catch(e) {
+        // Cross-origin block — show fallback
+        frame.style.display = 'none'; fallback.style.display = 'flex';
+      }
+    };
+  }
+
+  function openTodoistCompanion() {
+    var sw = window.screen.availWidth;
+    var sh = window.screen.availHeight;
+    var w = Math.round(sw * 0.5);
+    var left = sw - w;
+    var win = window.open('https://app.todoist.com', 'todoist_companion',
+      'width=' + w + ',height=' + sh + ',left=' + left + ',top=0,resizable=yes,scrollbars=yes');
+    if (!win) alert('Please allow pop-ups for this page to use the companion window.');
+  }
 
   function openPracArticle(el, title, url) {
     document.querySelectorAll('.prac-list-item').forEach(i => i.classList.remove('selected'));
@@ -692,12 +765,13 @@
 
     // Render steps on right
     var steps = pracSteps[title] || [];
-    var html = '<div class="prac-steps-panel"><h3>' + title + '</h3><p class="prac-steps-sub">Segui questi passaggi nel tuo account Todoist</p>';
+    var html = '<div class="prac-steps-panel"><h3>' + title + '</h3><p class="prac-steps-sub">Follow these steps in your Todoist account</p>';
     steps.forEach(function(s, i) {
       html += '<div class="prac-step"><div class="prac-step-num">' + (i+1) + '</div><div class="prac-step-body"><strong>' + s.t + '</strong><p>' + s.d + '</p>' + (s.tip ? '<div class="prac-step-tip">💡 ' + s.tip + '</div>' : '') + '</div></div>';
     });
-    html += '<div class="prac-done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Esercizio completato — ottimo lavoro!</div></div>';
+    html += '<div class="prac-done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Exercise complete — great work!</div></div>';
     document.getElementById('prac-right-body').innerHTML = html;
+    if (pracCurrentTab !== 'steps') switchPracTab('steps');
   }
 
   function closePracArticle() {
@@ -705,7 +779,7 @@
     document.getElementById('prac-list').style.display = 'block';
     document.getElementById('prac-article-frame').src = '';
     document.querySelectorAll('.prac-list-item').forEach(i => i.classList.remove('selected'));
-    document.getElementById('prac-right-body').innerHTML = '<div class="prac-welcome"><div class="prac-welcome-icon">👈</div><h3>Seleziona un articolo</h3><p>Scegli un articolo dalla lista a sinistra per vedere i passaggi dell\'esercizio e praticarlo nel tuo account Todoist.</p></div>';
+    document.getElementById('prac-right-body').innerHTML = '<div class="prac-welcome"><div class="prac-welcome-icon">👈</div><h3>Select an article</h3><p>Choose an article from the list on the left to see the guided exercise steps.</p></div>';
   }
 
   function openHC(title, url) {
