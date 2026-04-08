@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HC Split View</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      display: flex;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+    }
+
+    /* LEFT PANEL */
+    #left-panel {
+      width: 420px;
+      min-width: 320px;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+    }
+
+    #left-header {
+      padding: 14px 18px;
+      background: #db4035;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    #left-header svg { flex-shrink: 0; }
+
+    #left-header span {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    /* TABS */
+    #tabs {
+      display: flex;
+      border-bottom: 2px solid #e8e8e8;
+      background: #fafafa;
+      flex-shrink: 0;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      text-align: center;
+      transition: color 0.15s, border-color 0.15s;
+      user-select: none;
+    }
+
+    .tab:hover { color: #db4035; }
+    .tab.active { color: #db4035; border-bottom-color: #db4035; }
+
+    /* TAB CONTENTS */
+    .tab-content { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .tab-content.active { display: flex; }
+
+    /* HC ARTICLE TAB */
+    #url-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid #e8e8e8;
+      background: #fafafa;
+      flex-shrink: 0;
+    }
+
+    #url-bar input {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #444;
+      background: #fff;
+    }
+
+    #url-bar button {
+      padding: 6px 12px;
+      background: #db4035;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #url-bar button:hover { background: #c0392b; }
+
+    #article-frame {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+
+    /* STEPS TAB */
+    #steps-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 18px;
+    }
+
+    .steps-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f1f1f;
+      margin-bottom: 4px;
+    }
+
+    .steps-subtitle {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    .step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+
+    .step-number {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #db4035;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-body { flex: 1; }
+
+    .step-body strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f1f1f;
+      margin-bottom: 4px;
+    }
+
+    .step-body p {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .step-body .tip {
+      margin-top: 6px;
+      padding: 8px 10px;
+      background: #fff8f7;
+      border-left: 3px solid #db4035;
+      border-radius: 0 6px 6px 0;
+      font-size: 11px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .step-divider {
+      width: 1px;
+      background: #f0f0f0;
+      height: 12px;
+      margin: 0 0 8px 12px;
+    }
+
+    .steps-done {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      padding: 12px 14px;
+      background: #f0faf4;
+      border-radius: 8px;
+      border: 1px solid #c3e6cb;
+    }
+
+    .steps-done span {
+      font-size: 12px;
+      color: #2d6a4f;
+      font-weight: 600;
+    }
+
+    /* DIVIDER */
+    #divider {
+      width: 4px;
+      background: #e0e0e0;
+      cursor: col-resize;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    #divider:hover { background: #db4035; }
+
+    /* RIGHT PANEL */
+    #right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    #right-header {
+      padding: 14px 18px;
+      background: #1f1f1f;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    #right-header span {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    #right-header .pill {
+      margin-left: auto;
+      font-size: 11px;
+      background: rgba(255,255,255,0.15);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    #app-frame {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+
+    #blocked-msg {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px;
+      text-align: center;
+      color: #666;
+    }
+
+    #blocked-msg h2 { font-size: 18px; color: #333; }
+    #blocked-msg p { font-size: 14px; line-height: 1.6; max-width: 360px; }
+    #blocked-msg a {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 10px 20px;
+      background: #db4035;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT PANEL -->
+  <div id="left-panel">
+    <div id="left-header">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+      </svg>
+      <span>Help Center</span>
+    </div>
+
+    <!-- TABS -->
+    <div id="tabs">
+      <div class="tab active" onclick="switchTab('article')">HC Article</div>
+      <div class="tab" onclick="switchTab('steps')">Create a Project</div>
+    </div>
+
+    <!-- TAB: HC Article -->
+    <div class="tab-content active" id="tab-article">
+      <div id="url-bar">
+        <input type="text" id="hc-url" placeholder="Paste HC article URL…" value="https://todoist.com/help/articles/introduction-to-todoist-JkndYvpUn" />
+        <button onclick="loadArticle()">Load</button>
+      </div>
+      <iframe id="article-frame" src="https://todoist.com/help/articles/introduction-to-todoist-JkndYvpUn" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
+    <!-- TAB: Create a Project -->
+    <div class="tab-content" id="tab-steps">
+      <div id="steps-content">
+        <div class="steps-title">How to create a project</div>
+        <div class="steps-subtitle">Follow these steps in your Todoist account on the right</div>
+
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-body">
+            <strong>Open the sidebar</strong>
+            <p>In the left sidebar of Todoist, scroll down to the <strong>My Projects</strong> section.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-body">
+            <strong>Click the + button</strong>
+            <p>Hover over <strong>My Projects</strong> and click the <strong>+</strong> icon that appears to the right of it.</p>
+            <div class="tip">You can also use the keyboard shortcut <strong>G</strong> then <strong>P</strong> to go straight to Projects.</div>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-body">
+            <strong>Name your project</strong>
+            <p>Type a name for your project in the field that appears (e.g. "Work", "Personal", "Shopping list").</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-body">
+            <strong>Choose a color (optional)</strong>
+            <p>Click the color swatch to pick a color that helps you visually identify this project.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+
+        <div class="step">
+          <div class="step-number">5</div>
+          <div class="step-body">
+            <strong>Add to Favorites (optional)</strong>
+            <p>Toggle <strong>Add to Favorites</strong> to pin the project to the top of your sidebar for quick access.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+
+        <div class="step">
+          <div class="step-number">6</div>
+          <div class="step-body">
+            <strong>Click Add</strong>
+            <p>Hit <strong>Add</strong> to save the project. It will now appear in your sidebar under My Projects.</p>
+            <div class="tip">You can add tasks to your new project by clicking into it and pressing <strong>+</strong> or hitting <strong>Q</strong> for Quick Add.</div>
+          </div>
+        </div>
+
+        <div class="steps-done">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Your project is ready — start adding tasks!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div id="divider"></div>
+
+  <!-- RIGHT: Todoist App -->
+  <div id="right-panel">
+    <div id="right-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#db4035"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14l-4-4 1.41-1.41L11 13.17l6.59-6.59L19 8l-8 8z"/></svg>
+      <span>Todoist</span>
+      <span class="pill">todoist.com/app</span>
+    </div>
+    <iframe id="app-frame" src="https://www.todoist.com/app" allow="clipboard-read; clipboard-write"></iframe>
+    <div id="blocked-msg">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <h2>Todoist can't be embedded</h2>
+      <p>The Todoist app blocks iframe embedding for security reasons. Open it in a separate tab instead.</p>
+      <a href="https://www.todoist.com/app" target="_blank">Open Todoist →</a>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    // Load HC article from URL bar
+    function loadArticle() {
+      const url = document.getElementById('hc-url').value.trim();
+      if (url) document.getElementById('article-frame').src = url;
+    }
+
+    document.getElementById('hc-url').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') loadArticle();
+    });
+
+    // Detect if Todoist iframe is blocked
+    const appFrame = document.getElementById('app-frame');
+    const blockedMsg = document.getElementById('blocked-msg');
+
+    appFrame.addEventListener('error', () => {
+      appFrame.style.display = 'none';
+      blockedMsg.style.display = 'flex';
+    });
+
+    // Draggable divider
+    const divider = document.getElementById('divider');
+    const leftPanel = document.getElementById('left-panel');
+    let dragging = false;
+
+    divider.addEventListener('mousedown', () => { dragging = true; });
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const newWidth = e.clientX;
+      if (newWidth > 280 && newWidth < window.innerWidth - 400) {
+        leftPanel.style.width = newWidth + 'px';
+      }
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
+  </script>
+
+</body>
+</html>
