@@ -542,29 +542,16 @@
     <!-- RIGHT: tabs — Exercise steps | Todoist -->
     <div class="prac-right">
       <div class="prac-right-header">
-        <button class="prac-rtab active" id="rtab-steps" onclick="switchPracTab('steps')">Exercise</button>
-        <button class="prac-rtab" id="rtab-todoist" onclick="switchPracTab('todoist')">Create a filter</button>
+        <span>Create a filter — Interactive Demo</span>
       </div>
 
-      <!-- Exercise tab -->
-      <div class="prac-right-body" id="prac-right-body">
-        <div class="prac-welcome">
-          <div class="prac-welcome-icon">👈</div>
-          <h3>Select an article</h3>
-          <p>Choose an article from the list on the left to see the guided exercise steps.</p>
-        </div>
-      </div>
-
-      <!-- Create a filter demo tab -->
-      <div id="prac-todoist-tab" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
-        <iframe
-          src="https://demo.arcade.software/66JvkcM4F6A4ga8tO6hQ?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
-          title="Create a filter"
-          allow="clipboard-write"
-          allowfullscreen
-          style="flex:1; border:none; width:100%; display:block;">
-        </iframe>
-      </div>
+      <iframe
+        src="https://demo.arcade.software/66JvkcM4F6A4ga8tO6hQ?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
+        title="Create a filter"
+        allow="clipboard-write"
+        allowfullscreen
+        style="flex:1; border:none; width:100%;">
+      </iframe>
     </div>
 
   </section>
@@ -650,12 +637,6 @@
     ]
   };
 
-  function switchPracTab(tab) {
-    document.getElementById('rtab-steps').classList.toggle('active', tab === 'steps');
-    document.getElementById('rtab-todoist').classList.toggle('active', tab === 'todoist');
-    document.getElementById('prac-right-body').style.display = tab === 'steps' ? 'block' : 'none';
-    document.getElementById('prac-todoist-tab').style.display = tab === 'todoist' ? 'flex' : 'none';
-  }
 
   function openPracArticle(el, title, url) {
     document.querySelectorAll('.prac-list-item').forEach(i => i.classList.remove('selected'));
@@ -688,7 +669,6 @@
     });
     html += '<div class="prac-done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Exercise complete — great work!</div></div>';
     document.getElementById('prac-right-body').innerHTML = html;
-    switchPracTab('steps');
   }
 
   function closePracArticle() {
@@ -696,7 +676,7 @@
     document.getElementById('prac-list').style.display = 'block';
     document.getElementById('prac-article-frame').src = '';
     document.querySelectorAll('.prac-list-item').forEach(i => i.classList.remove('selected'));
-    document.getElementById('prac-right-body').innerHTML = '<div class="prac-welcome"><div class="prac-welcome-icon">👈</div><h3>Select an article</h3><p>Choose an article from the list on the left to see the guided exercise steps.</p></div>';
+    document.getElementById('prac-right-body').innerHTML = '';
   }
 
   function openHC(title, url) {
