@@ -91,6 +91,21 @@
     .res-info h4 { font-size: 14px; font-weight: 600; }
     .res-info p { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
     .res-action { margin-left: auto; font-size: 12px; color: var(--red); font-weight: 600; white-space: nowrap; }
+
+    .article-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+    .article-item { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--gray-border); border-radius: 10px; padding: 14px 18px; }
+    .article-rank { font-size: 13px; font-weight: 700; color: var(--gray-mid); width: 22px; text-align: right; flex-shrink: 0; }
+    .article-rank.top3 { color: var(--red); }
+    .article-info { flex: 1; min-width: 0; }
+    .article-info h4 { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .article-views { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
+    .eng-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+    .eng-green  { background: #E6F4EA; color: #1E8E3E; }
+    .eng-yellow { background: #FFF8E1; color: #B06C00; }
+    .eng-orange { background: #FFF3E0; color: #E65100; }
+    .eng-red    { background: #FDECEA; color: #C5221F; }
+    .eng-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .eng-legend span { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
   </style>
 </head>
 <body>
@@ -120,6 +135,7 @@
 
     <div class="nav-label">Resources</div>
     <a href="#" onclick="return show('resources')"><span class="icon">📎</span> Downloads & Links</a>
+    <a href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <div class="sidebar-footer">Champion Portal v1.0</div>
 </aside>
@@ -372,6 +388,87 @@
       <a class="resource-item" href="https://todoist.com/help" target="_blank"><span class="res-icon">📚</span><div class="res-info"><h4>Help Center</h4><p>Official documentation for all features.</p></div><span class="res-action">Open →</span></a>
       <a class="resource-item" href="https://todoist.com/templates" target="_blank"><span class="res-icon">🗂️</span><div class="res-info"><h4>Project Templates</h4><p>Ready-made templates for team workflows.</p></div><span class="res-action">Open →</span></a>
       <a class="resource-item" href="https://todoist.com/integrations" target="_blank"><span class="res-icon">🔌</span><div class="res-info"><h4>Integrations</h4><p>Connect Todoist with your existing tools.</p></div><span class="res-action">Open →</span></a>
+    </div>
+  </section>
+
+
+  <!-- HELP CENTER INSIGHTS -->
+  <section id="help-center" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Resources</div>
+      <h1>Help Center Insights</h1>
+      <p>The 10 most-visited Help Center articles and their engagement rates. Use this to anticipate where your team will have questions.</p>
+    </div>
+
+    <div class="tip-box">
+      <strong>What is engagement rate?</strong>
+      <p>Engagement measures how deeply readers interact with an article relative to its view count. A rate above 100% means readers are scrolling, re-reading, or sharing — a sign the content is genuinely useful.</p>
+    </div>
+
+    <div class="eng-legend">
+      <span class="eng-badge eng-green">✅ Strong (≥ 98%)</span>
+      <span class="eng-badge eng-yellow">🔶 Moderate (70–97%)</span>
+      <span class="eng-badge eng-orange">⚠️ Low (50–69%)</span>
+      <span class="eng-badge eng-red">🔴 Very low (&lt; 50%)</span>
+    </div>
+
+    <h2 class="section-title">Top 10 most-read articles</h2>
+    <div class="article-list">
+      <div class="article-item">
+        <span class="article-rank top3">1</span>
+        <div class="article-info"><h4>Use The Calendar Integration</h4><div class="article-views">36,391 views</div></div>
+        <span class="eng-badge eng-orange">⚠️ 60%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank top3">2</span>
+        <div class="article-info"><h4>Introduction To Filters</h4><div class="article-views">22,309 views</div></div>
+        <span class="eng-badge eng-green">✅ 126%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank top3">3</span>
+        <div class="article-info"><h4>Get Started With Todoist</h4><div class="article-views">13,124 views</div></div>
+        <span class="eng-badge eng-green">✅ 127%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank">4</span>
+        <div class="article-info"><h4>Forward Emails To Todoist</h4><div class="article-views">12,401 views</div></div>
+        <span class="eng-badge eng-green">✅ 98%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank">5</span>
+        <div class="article-info"><h4>Use The Inbox In Todoist</h4><div class="article-views">10,231 views</div></div>
+        <span class="eng-badge eng-green">✅ 88%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank">6</span>
+        <div class="article-info"><h4>Usage Limits In Todoist</h4><div class="article-views">9,688 views</div></div>
+        <span class="eng-badge eng-yellow">🔶 76%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank">7</span>
+        <div class="article-info"><h4>Dictate To Add Tasks With Ramble</h4><div class="article-views">9,491 views</div></div>
+        <span class="eng-badge eng-green">✅ 101%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank">8</span>
+        <div class="article-info"><h4>Customize Views In Todoist</h4><div class="article-views">9,138 views</div></div>
+        <span class="eng-badge eng-orange">⚠️ 58%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank">9</span>
+        <div class="article-info"><h4>Introduction To Projects</h4><div class="article-views">8,873 views</div></div>
+        <span class="eng-badge eng-red">🔴 37%</span>
+      </div>
+      <div class="article-item">
+        <span class="article-rank">10</span>
+        <div class="article-info"><h4>Changelog Entries From 2026</h4><div class="article-views">8,316 views</div></div>
+        <span class="eng-badge eng-red">🔴 38%</span>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Champion action</strong>
+      <p>Articles with low engagement (⚠️ and 🔴) are being found but not absorbed — consider covering these topics live in training sessions to close the comprehension gap. Calendar Integration and Customize Views in particular have very high traffic but low engagement.</p>
     </div>
   </section>
 
