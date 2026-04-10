@@ -100,42 +100,15 @@
     .res-info p { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
     .res-action { margin-left: auto; font-size: 12px; color: var(--red); font-weight: 600; white-space: nowrap; }
 
-    /* PRACTICE MODE */
-    #practice.page-section { padding: 0; max-width: none; overflow: hidden; }
-    #practice.page-section.active { display: flex; height: 100vh; }
+    /* EXERCISE SECTIONS (split-view, fullscreen) */
+    .exercise-section.page-section { padding: 0; max-width: none; overflow: hidden; }
+    .exercise-section.page-section.active { display: flex; height: 100vh; }
     .prac-left { width: 400px; min-width: 280px; display: flex; flex-direction: column; border-right: 1px solid var(--gray-border); background: var(--gray-light); overflow: hidden; flex-shrink: 0; }
     .prac-header { padding: 18px 22px; border-bottom: 1px solid var(--gray-border); flex-shrink: 0; background: var(--white); }
     .prac-header h2 { font-size: 15px; font-weight: 700; letter-spacing: -0.1px; }
     .prac-header p { font-size: 12px; color: var(--gray-mid); margin-top: 4px; line-height: 1.55; }
-    .prac-list { flex: 1; overflow-y: auto; }
-    .prac-list-item { display: flex; align-items: center; gap: 14px; padding: 13px 22px; border-bottom: 1px solid var(--gray-border); cursor: pointer; background: var(--white); transition: background 0.12s; }
-    .prac-list-item:hover { background: #faf8f6; }
-    .prac-list-item.selected { background: var(--red-light); border-left: 3px solid var(--red); padding-left: 19px; }
-    .prac-item-rank { font-size: 12px; font-weight: 700; color: var(--gray-mid); width: 18px; text-align: right; flex-shrink: 0; }
-    .prac-item-title { font-size: 13px; font-weight: 600; flex: 1; }
-    .prac-item-arrow { font-size: 11px; color: var(--gray-mid); }
-    .prac-article-view { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-    .prac-article-view.visible { display: flex; }
-    .prac-article-topbar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--gray-border); flex-shrink: 0; background: #faf8f6; }
-    .prac-back { font-size: 12px; font-weight: 600; color: var(--red); cursor: pointer; background: none; border: none; padding: 0; white-space: nowrap; }
-    .prac-article-name { font-size: 12px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--gray-dark); }
-    .prac-newtab { font-size: 11px; font-weight: 600; color: var(--red); text-decoration: none; border: 1.5px solid var(--red); padding: 3px 9px; border-radius: 8px; white-space: nowrap; }
-    .prac-article-frame { flex: 1; border: none; width: 100%; }
-    .prac-blocked-article { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px; text-align: center; }
-    .prac-blocked-article p { font-size: 13px; color: var(--gray-mid); line-height: 1.6; }
     .prac-right { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--white); }
-    .prac-right-header { display: flex; align-items: center; gap: 2px; padding: 0 18px; background: #1c1917; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
-    .prac-rtab { padding: 13px 16px; background: none; border: none; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; font-family: var(--font); }
-    .prac-rtab:hover { color: rgba(255,255,255,0.75); }
-    .prac-rtab.active { color: white; border-bottom-color: var(--red); }
-    .prac-right-body { flex: 1; overflow-y: auto; }
-    .prac-welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; padding: 40px; text-align: center; }
-    .prac-welcome .prac-welcome-icon { font-size: 40px; }
-    .prac-welcome h3 { font-size: 16px; font-weight: 700; }
-    .prac-welcome p { font-size: 13px; color: var(--gray-mid); line-height: 1.6; max-width: 320px; }
-    .prac-steps-panel { padding: 24px 28px; }
-    .prac-steps-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-    .prac-steps-panel .prac-steps-sub { font-size: 12px; color: var(--gray-mid); margin-bottom: 24px; }
+    .prac-right-header { display: flex; align-items: center; gap: 2px; padding: 13px 18px; background: #1c1917; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.07); color: white; font-size: 13px; font-weight: 600; }
     .prac-step { display: flex; gap: 14px; margin-bottom: 18px; }
     .prac-step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
     .prac-step-body strong { display: block; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
@@ -184,13 +157,16 @@
     <a href="#" onclick="return show('m3')"><span class="icon">📙</span> Module 3 — Collaboration</a>
     <a href="#" onclick="return show('m4')"><span class="icon">📕</span> Module 4 — Advanced</a>
 
+    <div class="nav-label">Exercises</div>
+    <a href="#" onclick="return show('exercise-1')"><span class="icon">🎯</span> Exercise 1 — Guided</a>
+    <a href="#" onclick="return show('exercise-2')"><span class="icon">🪟</span> Exercise 2 — Sandbox</a>
+
     <div class="nav-label">Train your team</div>
     <a href="#" onclick="return show('trainer')"><span class="icon">🎓</span> Running Sessions</a>
 
     <div class="nav-label">Resources</div>
     <a href="#" onclick="return show('resources')"><span class="icon">📎</span> Downloads & Links</a>
     <a href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
-    <a href="#" onclick="return show('practice')"><span class="icon">🪟</span> Practice Mode</a>
   </nav>
   <div class="sidebar-footer">Champion Portal v1.0</div>
 </aside>
@@ -286,6 +262,8 @@
     <div class="lesson-list">
       <div class="lesson-item" onclick="show('demo-1')"><span class="lesson-num">▶</span><h4>Demo — Create folders</h4><span class="lesson-type demo">Interactive Demo</span></div>
       <div class="lesson-item" onclick="show('demo-2')"><span class="lesson-num">▶</span><h4>Demo — Create a filter</h4><span class="lesson-type demo">Interactive Demo</span></div>
+      <div class="lesson-item" onclick="show('exercise-1')"><span class="lesson-num">🎯</span><h4>Exercise — Create a filter (Guided)</h4><span class="lesson-type">Exercise · Arcade</span></div>
+      <div class="lesson-item" onclick="show('exercise-2')"><span class="lesson-num">🪟</span><h4>Exercise — Create a filter (Sandbox)</h4><span class="lesson-type">Exercise · Live</span></div>
       <div class="lesson-item" onclick="show('m3')"><span class="lesson-num">→</span><h4>Next: Module 3 — Collaboration</h4></div>
     </div>
   </section>
@@ -515,22 +493,123 @@
 
 
   <!-- PRACTICE MODE -->
-  <section id="practice" class="page-section">
+  <!-- EXERCISE 1 — Guided (Arcade) -->
+  <section id="exercise-1" class="page-section exercise-section">
 
-    <!-- LEFT: article list / article view -->
     <div class="prac-left">
       <div class="prac-header">
-        <h2>Practice Mode</h2>
-        <p>Select an article to read it here, then follow the guided steps in Todoist.</p>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Module 2 · Exercise 1</div>
+        <h2>Create a filter — Guided</h2>
+        <p>Follow the recorded walkthrough on the right. Every click is mapped — perfect for your first try.</p>
       </div>
 
-      <!-- Exercise -->
       <div style="flex:1; overflow-y:auto; padding:20px 22px;">
 
         <div style="margin-bottom:18px;">
-          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--gray-mid);margin-bottom:6px;">Exercise</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Create your first filter</div>
-          <div style="font-size:12px;color:var(--gray-mid);line-height:1.6;">Build a filter that shows all <strong>P1 tasks due today</strong> assigned to you. Follow the steps, then try it in the demo on the right.</div>
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--gray-mid);margin-bottom:6px;">Goal</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Build your first filter</div>
+          <div style="font-size:12px;color:var(--gray-mid);line-height:1.6;">Create a filter that shows all <strong>P1 tasks due today</strong> assigned to you. Follow the steps, then try it in the guided demo on the right.</div>
+        </div>
+
+        <div class="tip-box" style="margin-bottom:20px;">
+          <strong>Target query</strong>
+          <p style="font-family:monospace;font-size:13px;color:var(--red-dark);margin-top:4px;">today & p1 & assigned to: me</p>
+        </div>
+
+        <div class="prac-step">
+          <div class="prac-step-num">1</div>
+          <div class="prac-step-body">
+            <strong>Open Filters &amp; Labels</strong>
+            <p>Click <strong>Filters &amp; Labels</strong> in the left sidebar of Todoist.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">2</div>
+          <div class="prac-step-body">
+            <strong>Add a new filter</strong>
+            <p>Click the <strong>+</strong> icon next to Filters to open the Add filter window.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">3</div>
+          <div class="prac-step-body">
+            <strong>Name your filter</strong>
+            <p>Type <code>My urgent tasks today</code> in the Name field.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">4</div>
+          <div class="prac-step-body">
+            <strong>Enter the query</strong>
+            <p>In the Query field, type:</p>
+            <p style="font-family:monospace;font-size:13px;background:var(--gray-light);padding:6px 10px;border-radius:6px;margin-top:6px;color:var(--red-dark);">today &amp; p1 &amp; assigned to: me</p>
+            <div class="prac-step-tip">
+              <strong>today</strong> — due today &nbsp;·&nbsp; <strong>&amp;</strong> — AND &nbsp;·&nbsp; <strong>p1</strong> — priority 1 &nbsp;·&nbsp; <strong>assigned to: me</strong> — your tasks only
+            </div>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">5</div>
+          <div class="prac-step-body">
+            <strong>Save the filter</strong>
+            <p>Click <strong>Add</strong>. The filter now appears under Filters &amp; Labels in your sidebar.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">6</div>
+          <div class="prac-step-body">
+            <strong>Test it</strong>
+            <p>Click the filter to see all P1 tasks due today that are assigned to you.</p>
+            <div class="prac-step-tip">💡 Want to go further? Try <code>(today | overdue) &amp; p1</code> to also catch overdue P1 tasks.</div>
+          </div>
+        </div>
+
+        <div class="prac-done">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Done? Try Exercise 2 in the live sandbox →
+        </div>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-border);display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <a href="https://www.todoist.com/help/articles/introduction-to-filters-V98wIH" target="_blank" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Read the full article ↗</a>
+          <a href="#" onclick="return show('exercise-2')" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Next: Exercise 2 — Sandbox →</a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="prac-right">
+      <div class="prac-right-header">
+        <span>Todoist Demo — Guided walkthrough</span>
+      </div>
+
+      <iframe
+        src="https://demo.arcade.software/66JvkcM4F6A4ga8tO6hQ?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
+        title="Todoist Demo — Guided walkthrough"
+        allow="clipboard-write"
+        allowfullscreen
+        loading="lazy"
+        style="flex:1; border:none; width:100%;">
+      </iframe>
+    </div>
+
+  </section>
+
+  <!-- EXERCISE 2 — Sandbox (live Todoist) -->
+  <section id="exercise-2" class="page-section exercise-section">
+
+    <div class="prac-left">
+      <div class="prac-header">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Module 2 · Exercise 2</div>
+        <h2>Create a filter — Sandbox</h2>
+        <p>Now do it for real in a live Todoist environment. No script — free practice.</p>
+      </div>
+
+      <div style="flex:1; overflow-y:auto; padding:20px 22px;">
+
+        <div style="margin-bottom:18px;">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--gray-mid);margin-bottom:6px;">Goal</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Build the same filter — for real</div>
+          <div style="font-size:12px;color:var(--gray-mid);line-height:1.6;">Same target as Exercise 1, but this time you'll click through a live Todoist sandbox on the right. No safety rails.</div>
         </div>
 
         <div class="tip-box" style="margin-bottom:20px;">
@@ -591,25 +670,23 @@
           Exercise complete — great work!
         </div>
 
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-border);">
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-border);display:flex;justify-content:space-between;align-items:center;gap:12px;">
           <a href="https://www.todoist.com/help/articles/introduction-to-filters-V98wIH" target="_blank" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Read the full article ↗</a>
+          <a href="#" onclick="return show('m3')" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Next: Module 3 →</a>
         </div>
 
       </div>
     </div>
 
-    <!-- RIGHT: tabs — Exercise steps | Todoist -->
     <div class="prac-right">
       <div class="prac-right-header">
-        <span>Todoist Demo</span>
+        <span>Todoist Sandbox — Live</span>
       </div>
 
       <iframe
-        src="https://demo.arcade.software/66JvkcM4F6A4ga8tO6hQ?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
-        title="Todoist Sandbox"
-        allow="clipboard-write"
-        allowfullscreen
-        loading="lazy"
+        src="https://todoistsandbox.netlify.app"
+        title="Todoist Sandbox — Live"
+        allow="clipboard-read; clipboard-write"
         style="flex:1; border:none; width:100%;">
       </iframe>
     </div>
@@ -633,112 +710,6 @@
 
 </main>
 <script>
-  // Practice Mode — steps data
-  var pracSteps = {
-    'Use The Calendar Integration': [
-      { t: 'Open Settings', d: 'Go to Settings → Integrations → Calendar.' },
-      { t: 'Connect your calendar', d: 'Click "Connect Google Calendar" or "Connect Outlook" and complete the authorisation flow.' },
-      { t: 'Enable sync', d: 'Turn on the option to show tasks with due dates in your calendar.' },
-      { t: 'Verify', d: 'Create a task with a due date and check that it appears in your calendar.', tip: 'Recurring tasks show up as recurring events in your calendar.' }
-    ],
-    'Introduction To Filters': [
-      { t: 'Go to Filters & Labels', d: 'Click "Filters & Labels" in the left sidebar.' },
-      { t: 'Create a new filter', d: 'Click + and give the filter a name, e.g. "Today\'s priorities".' },
-      { t: 'Enter the query', d: 'Use the query: <code>today & p1</code> to see only P1 tasks due today.' },
-      { t: 'Save and test', d: 'Save the filter and click it to see the results.', tip: 'Also try: <code>assigned to: me & overdue</code> to catch overdue tasks.' }
-    ],
-    'Get Started With Todoist': [
-      { t: 'Add your first task', d: 'Press <code>Q</code> anywhere to open Quick Add. Type a real task from your work.' },
-      { t: 'Use natural language', d: 'Include a due date directly in the text, e.g. "Client call tomorrow at 3pm".' },
-      { t: 'Set a priority', d: 'Type <code>p1</code> in the text or use the flag icon to set the priority level.' },
-      { t: 'Complete the task', d: 'Click the circle to the left of the task to mark it as complete.' }
-    ],
-    'Forward Emails To Todoist': [
-      { t: 'Open a project', d: 'Go to an existing project (or create a new one called "Email Tasks").' },
-      { t: 'Find the project email address', d: 'Click the three dots ⋯ at the top right → "Email tasks to this project".' },
-      { t: 'Copy the address', d: 'Copy the unique email address generated by Todoist.' },
-      { t: 'Forward an email', d: 'Go to your inbox and forward an email to that address. Return to Todoist and confirm the task appeared.', tip: 'The email subject line becomes the task name.' }
-    ],
-    'Use The Inbox In Todoist': [
-      { t: 'Add 3 tasks to the Inbox', d: 'Press <code>Q</code> and add 3 tasks without specifying a project — they land in the Inbox automatically.' },
-      { t: 'Open the Inbox', d: 'Click "Inbox" in the left sidebar.' },
-      { t: 'Process your tasks', d: 'For each task: move it to the right project, set a due date, or delete it if it\'s not needed.' },
-      { t: 'Reach Inbox zero', d: 'Goal: empty Inbox. Every task should have a home and a date.', tip: 'Set aside 5–10 minutes each day to process your Inbox.' }
-    ],
-    'Usage Limits In Todoist': [
-      { t: 'Check your plan', d: 'Go to Settings → Account to see your active plan and current limits.' },
-      { t: 'Review active projects', d: 'Count how many active projects you have. The Beginner plan allows 5, Pro allows 300.' },
-      { t: 'Check collaborators', d: 'Open a shared project and review who the collaborators are and their roles.' },
-      { t: 'Plan an upgrade if needed', d: 'If you\'re approaching the limits, consider the Pro or Business plan for your team.', tip: 'Completed tasks do not count toward the active task limit.' }
-    ],
-    'Dictate To Add Tasks With Ramble': [
-      { t: 'Open Todoist on mobile', d: 'Use the iOS or Android app on your device.' },
-      { t: 'Find the Ramble button', d: 'Look for the microphone icon in the task-add bar.' },
-      { t: 'Dictate a task', d: 'Press and hold, then say a full task, e.g. "Prepare the presentation for next Friday".' },
-      { t: 'Review and save', d: 'Check that the date and project were recognised correctly, then save.', tip: 'You can also specify the project: "Add to the Marketing project..."' }
-    ],
-    'Customize Views In Todoist': [
-      { t: 'Open a project', d: 'Go to a project that has at least a few tasks.' },
-      { t: 'Change the layout', d: 'Click the layout button (top right) and switch from List to Board (Kanban).' },
-      { t: 'Group by priority', d: 'In the layout menu, select "Group by" → Priority to see tasks organised by urgency.' },
-      { t: 'Save the view', d: 'View settings are saved per project. Try different layouts for different projects.', tip: 'The Calendar view is particularly useful for projects with many due dates.' }
-    ],
-    'Introduction To Projects': [
-      { t: 'Create a project', d: 'Click + next to "My Projects" → give it a name, choose a colour and icon.' },
-      { t: 'Add sections', d: 'Click the three dots ⋯ → "Add section". Create: "To Do", "In Progress", "Done".' },
-      { t: 'Add tasks to sections', d: 'Add at least one task per section using the + below each section name.' },
-      { t: 'Share the project', d: 'Click the share icon (top right) and invite a colleague by email.', tip: 'You can duplicate a well-structured project to use it as a template for future initiatives.' }
-    ],
-    'Changelog Entries From 2026': [
-      { t: 'Read the latest entries', d: 'Scroll through the changelog and read the last 5 entries to understand recent changes.' },
-      { t: 'Identify relevant features', d: 'Note any features that could be useful for your team.' },
-      { t: 'Create a follow-up task', d: 'Press <code>Q</code> and create a task like "Share new feature X with the team — Friday".' },
-      { t: 'Share with your team', d: 'Copy the link to an entry and share it in your team\'s Slack channel or email.', tip: 'Keeping your team informed about new features is part of the Champion role.' }
-    ]
-  };
-
-
-  function openPracArticle(el, title, url) {
-    document.querySelectorAll('.prac-list-item').forEach(i => i.classList.remove('selected'));
-    el.classList.add('selected');
-
-    // Load article in left iframe
-    document.getElementById('prac-article-name').textContent = title;
-    document.getElementById('prac-newtab').href = url;
-    document.getElementById('prac-blocked-link').href = url;
-    var frame = document.getElementById('prac-article-frame');
-    var blocked = document.getElementById('prac-blocked-article');
-    frame.style.display = 'block';
-    blocked.style.display = 'none';
-    frame.src = url;
-    frame.onerror = function() { frame.style.display = 'none'; blocked.style.display = 'flex'; };
-    frame.onload = function() {
-      try {
-        var doc = frame.contentDocument || frame.contentWindow.document;
-        if (!doc || doc.body === null || doc.body.innerHTML === '') { frame.style.display = 'none'; blocked.style.display = 'flex'; }
-      } catch(e) {}
-    };
-    document.getElementById('prac-list').style.display = 'none';
-    document.getElementById('prac-article-view').classList.add('visible');
-
-    // Render steps on right
-    var steps = pracSteps[title] || [];
-    var html = '<div class="prac-steps-panel"><h3>' + title + '</h3><p class="prac-steps-sub">Follow these steps in your Todoist account</p>';
-    steps.forEach(function(s, i) {
-      html += '<div class="prac-step"><div class="prac-step-num">' + (i+1) + '</div><div class="prac-step-body"><strong>' + s.t + '</strong><p>' + s.d + '</p>' + (s.tip ? '<div class="prac-step-tip">💡 ' + s.tip + '</div>' : '') + '</div></div>';
-    });
-    html += '<div class="prac-done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Exercise complete — great work!</div></div>';
-    document.getElementById('prac-right-body').innerHTML = html;
-  }
-
-  function closePracArticle() {
-    document.getElementById('prac-article-view').classList.remove('visible');
-    document.getElementById('prac-list').style.display = 'block';
-    document.getElementById('prac-article-frame').src = '';
-    document.querySelectorAll('.prac-list-item').forEach(i => i.classList.remove('selected'));
-    document.getElementById('prac-right-body').innerHTML = '';
-  }
-
   function openHC(title, url) {
     document.getElementById('hc-panel-title').textContent = title;
     document.getElementById('hc-panel-newtab').href = url;
