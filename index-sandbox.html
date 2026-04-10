@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Todoist Champion Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #ee6449; --red-dark: #d4533a; --red-light: #fdf0ed;
+      --gray-dark: #1c1917; --gray-mid: #6b7280; --gray-light: #fefdfc;
+      --gray-border: #e8e3de; --white: #ffffff;
+      --sidebar-width: 264px;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); color: var(--gray-dark); background: var(--gray-light); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    #sidebar { width: var(--sidebar-width); min-height: 100vh; background: #1c1917; color: #fff; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100; overflow-y: auto; }
+    #sidebar .logo { display: flex; align-items: center; gap: 10px; padding: 22px 18px 18px; border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
+    #sidebar .logo img { width: 28px; height: 28px; border-radius: 6px; }
+    #sidebar .logo .logo-text span { display: block; font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+    #sidebar .logo .logo-text small { font-size: 10px; opacity: 0.4; text-transform: uppercase; letter-spacing: 0.8px; }
+    #sidebar nav { flex: 1; padding: 10px 0; }
+    .nav-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.25); padding: 16px 18px 5px; }
+    #sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 8px 18px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; font-weight: 500; border-radius: 8px; margin: 1px 8px; border-left: none; transition: all 0.12s; }
+    #sidebar nav a:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.06); }
+    #sidebar nav a.active { color: #fff; background: rgba(238,100,73,0.2); }
+    #sidebar nav a.active .icon { color: var(--red); }
+    #sidebar nav a .icon { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; transition: color 0.12s; }
+    #sidebar .sidebar-footer { padding: 12px 18px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11px; color: rgba(255,255,255,0.2); flex-shrink: 0; }
+
+    #main { margin-left: var(--sidebar-width); flex: 1; }
+    .page-section { display: none; padding: 48px 56px; max-width: 980px; }
+    .page-section.active { display: block; }
+
+    .breadcrumb { font-size: 11px; font-weight: 500; color: var(--gray-mid); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .page-header { margin-bottom: 36px; }
+    .page-header h1 { font-size: 32px; font-weight: 800; line-height: 1.15; letter-spacing: -0.5px; color: var(--gray-dark); }
+    .page-header p { margin-top: 10px; font-size: 15px; color: var(--gray-mid); line-height: 1.7; max-width: 640px; }
+    h2.section-title { font-size: 16px; font-weight: 700; letter-spacing: -0.1px; margin: 36px 0 14px; color: var(--gray-dark); }
+
+    .hero { background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%); border-radius: var(--radius); padding: 32px 36px; color: #fff; margin-bottom: 32px; display: flex; align-items: center; gap: 24px; }
+    .hero .hero-icon { font-size: 52px; flex-shrink: 0; }
+    .hero h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .hero p { font-size: 14px; opacity: 0.88; line-height: 1.65; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .card { background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); padding: 24px; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow-sm); }
+    .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: #ddd8d2; }
+    .card .card-icon { font-size: 26px; }
+    .card h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.1px; }
+    .card p { font-size: 13px; color: var(--gray-mid); line-height: 1.55; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; background: var(--red-light); color: var(--red); align-self: flex-start; margin-top: auto; }
+    .badge.blue { background: #eff6ff; color: #2563eb; }
+    .badge.green { background: #f0fdf4; color: #16a34a; }
+
+    .steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .step { display: flex; gap: 16px; background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow-sm); }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--red); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0; }
+    .step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .step-content p { font-size: 13px; color: var(--gray-mid); line-height: 1.55; }
+    .step-content ul { margin-top: 8px; padding-left: 16px; }
+    .step-content ul li { font-size: 13px; color: var(--gray-mid); line-height: 1.65; }
+    code { background: #f5f1ee; padding: 2px 6px; border-radius: 5px; font-size: 12px; font-family: 'Menlo', 'Monaco', monospace; color: var(--red-dark); border: 1px solid #e8e3de; }
+
+    .lesson-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+    .lesson-item { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); padding: 14px 18px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); }
+    .lesson-item:hover { box-shadow: var(--shadow-md); border-color: #ddd8d2; }
+    .lesson-num { font-size: 12px; font-weight: 700; color: var(--red); width: 28px; flex-shrink: 0; }
+    .lesson-item h4 { font-size: 14px; font-weight: 600; flex: 1; }
+    .lesson-meta { font-size: 11px; color: var(--gray-mid); white-space: nowrap; }
+    .lesson-type { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; background: var(--gray-border); color: var(--gray-mid); white-space: nowrap; }
+    .lesson-type.demo { background: var(--red-light); color: var(--red); }
+
+    .tip-box { background: var(--red-light); border-left: 3px solid var(--red); border-radius: 0 10px 10px 0; padding: 14px 18px; margin-bottom: 24px; }
+    .tip-box strong { display: block; font-size: 11px; font-weight: 700; color: var(--red); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .tip-box p { font-size: 13px; line-height: 1.6; }
+
+    .demo-container { background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); overflow: hidden; margin-bottom: 28px; box-shadow: var(--shadow-sm); }
+    .demo-header { padding: 14px 20px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #faf8f6; }
+    .demo-header h3 { font-size: 14px; font-weight: 600; }
+    .demo-actions { display: flex; align-items: center; gap: 10px; }
+    .demo-tag { font-size: 11px; font-weight: 600; background: var(--red-light); color: var(--red); padding: 3px 10px; border-radius: 99px; }
+    .demo-open-btn { font-size: 12px; font-weight: 600; color: var(--red); text-decoration: none; border: 1.5px solid var(--red); padding: 4px 12px; border-radius: 8px; transition: background 0.15s; }
+    .demo-open-btn:hover { background: var(--red-light); }
+    .demo-embed-wrapper { position: relative; padding-bottom: 62.5%; height: 0; overflow: hidden; }
+    .demo-embed-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+    .resource-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+    .resource-item { display: flex; align-items: center; gap: 16px; background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); padding: 14px 18px; text-decoration: none; color: inherit; transition: box-shadow 0.15s, border-color 0.15s; cursor: pointer; box-shadow: var(--shadow-sm); }
+    .resource-item:hover { box-shadow: var(--shadow-md); border-color: #ddd8d2; }
+    .res-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+    .res-info h4 { font-size: 14px; font-weight: 600; }
+    .res-info p { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
+    .res-action { margin-left: auto; font-size: 12px; color: var(--red); font-weight: 600; white-space: nowrap; }
+
+    /* PRACTICE MODE */
+    #practice.page-section { padding: 0; max-width: none; overflow: hidden; }
+    #practice.page-section.active { display: flex; height: 100vh; }
+    .prac-left { width: 400px; min-width: 280px; display: flex; flex-direction: column; border-right: 1px solid var(--gray-border); background: var(--gray-light); overflow: hidden; flex-shrink: 0; }
+    .prac-header { padding: 18px 22px; border-bottom: 1px solid var(--gray-border); flex-shrink: 0; background: var(--white); }
+    .prac-header h2 { font-size: 15px; font-weight: 700; letter-spacing: -0.1px; }
+    .prac-header p { font-size: 12px; color: var(--gray-mid); margin-top: 4px; line-height: 1.55; }
+    .prac-list { flex: 1; overflow-y: auto; }
+    .prac-list-item { display: flex; align-items: center; gap: 14px; padding: 13px 22px; border-bottom: 1px solid var(--gray-border); cursor: pointer; background: var(--white); transition: background 0.12s; }
+    .prac-list-item:hover { background: #faf8f6; }
+    .prac-list-item.selected { background: var(--red-light); border-left: 3px solid var(--red); padding-left: 19px; }
+    .prac-item-rank { font-size: 12px; font-weight: 700; color: var(--gray-mid); width: 18px; text-align: right; flex-shrink: 0; }
+    .prac-item-title { font-size: 13px; font-weight: 600; flex: 1; }
+    .prac-item-arrow { font-size: 11px; color: var(--gray-mid); }
+    .prac-article-view { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .prac-article-view.visible { display: flex; }
+    .prac-article-topbar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--gray-border); flex-shrink: 0; background: #faf8f6; }
+    .prac-back { font-size: 12px; font-weight: 600; color: var(--red); cursor: pointer; background: none; border: none; padding: 0; white-space: nowrap; }
+    .prac-article-name { font-size: 12px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--gray-dark); }
+    .prac-newtab { font-size: 11px; font-weight: 600; color: var(--red); text-decoration: none; border: 1.5px solid var(--red); padding: 3px 9px; border-radius: 8px; white-space: nowrap; }
+    .prac-article-frame { flex: 1; border: none; width: 100%; }
+    .prac-blocked-article { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px; text-align: center; }
+    .prac-blocked-article p { font-size: 13px; color: var(--gray-mid); line-height: 1.6; }
+    .prac-right { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--white); }
+    .prac-right-header { display: flex; align-items: center; gap: 2px; padding: 0 18px; background: #1c1917; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .prac-rtab { padding: 13px 16px; background: none; border: none; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; font-family: var(--font); }
+    .prac-rtab:hover { color: rgba(255,255,255,0.75); }
+    .prac-rtab.active { color: white; border-bottom-color: var(--red); }
+    .prac-right-body { flex: 1; overflow-y: auto; }
+    .prac-welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; padding: 40px; text-align: center; }
+    .prac-welcome .prac-welcome-icon { font-size: 40px; }
+    .prac-welcome h3 { font-size: 16px; font-weight: 700; }
+    .prac-welcome p { font-size: 13px; color: var(--gray-mid); line-height: 1.6; max-width: 320px; }
+    .prac-steps-panel { padding: 24px 28px; }
+    .prac-steps-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .prac-steps-panel .prac-steps-sub { font-size: 12px; color: var(--gray-mid); margin-bottom: 24px; }
+    .prac-step { display: flex; gap: 14px; margin-bottom: 18px; }
+    .prac-step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .prac-step-body strong { display: block; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .prac-step-body p { font-size: 12px; color: var(--gray-mid); line-height: 1.6; }
+    .prac-step-tip { margin-top: 6px; padding: 8px 12px; background: var(--red-light); border-left: 3px solid var(--red); border-radius: 0 8px 8px 0; font-size: 11px; color: var(--gray-mid); line-height: 1.5; }
+    .prac-done { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 12px 14px; background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0; font-size: 12px; font-weight: 600; color: #15803d; }
+
+    .article-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+    .article-item { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); padding: 14px 18px; box-shadow: var(--shadow-sm); cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; }
+    .article-item:hover { box-shadow: var(--shadow-md); border-color: #ddd8d2; }
+    .article-rank { font-size: 13px; font-weight: 700; color: var(--gray-mid); width: 22px; text-align: right; flex-shrink: 0; }
+    .article-info { flex: 1; min-width: 0; }
+    .article-info h4 { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hc-panel { position: fixed; top: 0; right: -700px; width: 700px; max-width: 100vw; height: 100vh; background: var(--white); box-shadow: -8px 0 40px rgba(0,0,0,0.12); z-index: 200; display: flex; flex-direction: column; transition: right 0.25s ease; }
+    .hc-panel.open { right: 0; }
+    .hc-panel-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--gray-border); flex-shrink: 0; background: #faf8f6; }
+    .hc-panel-title { font-size: 14px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hc-panel-newtab { font-size: 12px; font-weight: 600; color: var(--red); text-decoration: none; border: 1.5px solid var(--red); padding: 4px 12px; border-radius: 8px; white-space: nowrap; }
+    .hc-panel-newtab:hover { background: var(--red-light); }
+    .hc-panel-close { font-size: 18px; color: var(--gray-mid); cursor: pointer; background: none; border: none; padding: 4px 8px; line-height: 1; }
+    .hc-panel-close:hover { color: var(--gray-dark); }
+    .hc-panel iframe { flex: 1; border: none; width: 100%; }
+    .hc-panel-blocked { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px; text-align: center; }
+    .hc-panel-blocked p { font-size: 14px; color: var(--gray-mid); line-height: 1.6; }
+    .hc-overlay { display: none; position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 199; backdrop-filter: blur(2px); }
+    .hc-overlay.open { display: block; }
+  </style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="logo">
+    <img src="https://todoist.com/static/favicon.ico" alt="Todoist" />
+    <div class="logo-text">
+      <span>Champion Portal</span>
+      <small>Todoist Training</small>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-label">Start here</div>
+    <a href="#" class="active" onclick="return show('overview')"><span class="icon">🏠</span> Overview</a>
+
+    <div class="nav-label">Full Course</div>
+    <a href="#" onclick="return show('m1')"><span class="icon">📗</span> Module 1 — Fundamentals</a>
+    <a href="#" onclick="return show('m2')"><span class="icon">📘</span> Module 2 — Core Features</a>
+    <a href="#" onclick="return show('m3')"><span class="icon">📙</span> Module 3 — Collaboration</a>
+    <a href="#" onclick="return show('m4')"><span class="icon">📕</span> Module 4 — Advanced</a>
+
+    <div class="nav-label">Train your team</div>
+    <a href="#" onclick="return show('trainer')"><span class="icon">🎓</span> Running Sessions</a>
+
+    <div class="nav-label">Resources</div>
+    <a href="#" onclick="return show('resources')"><span class="icon">📎</span> Downloads & Links</a>
+    <a href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
+    <a href="#" onclick="return show('practice')"><span class="icon">🪟</span> Practice Mode</a>
+  </nav>
+  <div class="sidebar-footer">Champion Portal v1.0</div>
+</aside>
+
+<main id="main">
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="page-section active">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal</div>
+      <h1>The Todoist Team Champion Hub</h1>
+      <p>The essential one-stop resource for driving successful team adoption.</p>
+    </div>
+    <div class="card-grid">
+      <div class="card" onclick="show('m1')">
+        <div class="card-icon">📚</div>
+        <h3>Training Resources</h3>
+        <p>Short, targeted guides for your team's common workflows.</p>
+        <span class="badge">Guides</span>
+      </div>
+      <div class="card" onclick="show('m2')">
+        <div class="card-icon">🔦</div>
+        <h3>Feature Spotlights</h3>
+        <p>Quick deep dives into the most important features for team productivity.</p>
+        <span class="badge blue">Deep Dives</span>
+      </div>
+      <div class="card" onclick="show('trainer')">
+        <div class="card-icon">🗺️</div>
+        <h3>Rollout Toolkit</h3>
+        <p>Clear, step-by-step guidance to manage the adoption process and serve as your team's primary contact for setup and best practices.</p>
+        <span class="badge green">Toolkit</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 1 -->
+  <section id="m1" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 1</div>
+      <h1>Todoist Fundamentals</h1>
+      <p>Understand what Todoist is, how it's structured, and how to set up a workspace for your team.</p>
+    </div>
+    <h2 class="section-title">1.1 — What is Todoist?</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>A task manager built for teams</h4><p>Todoist helps individuals and teams capture, organise, and act on their work — across all devices. The Business plan adds workspace-level collaboration, task assignment, and admin controls.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Two workspaces in one account</h4><p>Every user has <strong>My Projects</strong> (personal) and their team workspace. Both are accessible from the same sidebar.</p></div></div>
+    </div>
+    <h2 class="section-title">1.2 — Workspace Setup</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Create your workspace</h4><p>Go to <code>todoist.com</code> → click your workspace name → <em>Create or join a workspace</em>. Give it your company or team name.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Invite team members</h4><p>From workspace Settings → Members, invite by email. Assign admin or member roles.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Organise with folders</h4><p>Click workspace name → <em>Add folder</em>. Group related projects (e.g., "Marketing Campaigns", "Operations").</p></div></div>
+    </div>
+    <div class="tip-box">
+      <strong>Champion tip</strong>
+      <p>Set up a "Training" project before your onboarding session — a sandbox where team members can practice hands-on without affecting real work.</p>
+    </div>
+    <h2 class="section-title">1.3 — The Interface</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Left sidebar</h4><p>Contains Today, Upcoming, filters, labels, and all projects. The workspace section lives at the bottom.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Available on all platforms</h4><p>Web, macOS, Windows, iOS, Android. Experience is consistent. Keyboard shortcuts vary slightly on mobile.</p></div></div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('m2')"><span class="lesson-num">→</span><h4>Next: Module 2 — Core Features</h4></div>
+    </div>
+  </section>
+
+  <!-- MODULE 2 -->
+  <section id="m2" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 2</div>
+      <h1>Core Features</h1>
+      <p>A deep dive into the features your team will use every day.</p>
+    </div>
+    <h2 class="section-title">2.1 — Tasks</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Quick Add (<code>Q</code>)</h4><p>Press <code>Q</code> anywhere to open Quick Add. Todoist parses dates, priorities, and labels from natural language automatically.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Natural language</h4><p>Examples: <code>Report due friday 3pm p1</code>, <code>Team sync every monday at 9am</code>, <code>Follow up in 3 days</code>.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Priorities</h4><p><strong>P1</strong> (red) → <strong>P2</strong> (orange) → <strong>P3</strong> (blue) → <strong>P4</strong> (default). Agree on a team-wide priority convention.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><h4>Recurring tasks</h4><p>Type <code>every monday</code>, <code>every 2 weeks</code>, <code>every month on the 1st</code>. Completing one instance auto-schedules the next.</p></div></div>
+    </div>
+    <h2 class="section-title">2.2 — Projects & Sections</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Create a project</h4><p>Click <strong>+</strong> next to workspace name → <em>Add project</em> → name, layout (List or Board), colour.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Add sections</h4><p>Three-dot menu → <em>Add section</em>. Use "To Do / In Progress / Done" or a workflow specific to your team.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Share the project</h4><p>Share icon (top right) → enter email → <em>Invite</em>. Members can join immediately.</p></div></div>
+    </div>
+    <h2 class="section-title">2.3 — Labels & Filters</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Labels</h4><p>Add labels to tasks across projects (e.g., <code>@client</code>, <code>@urgent</code>, <code>@waiting</code>). Use them to build powerful cross-project views.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Custom filters</h4><p>Filters & Labels → <strong>+</strong> → define a query. Examples: <code>today &amp; assigned to: me</code>, <code>p1 &amp; overdue</code>, <code>@waiting</code>.</p></div></div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('demo-1')"><span class="lesson-num">▶</span><h4>Demo — Create folders</h4><span class="lesson-type demo">Interactive Demo</span></div>
+      <div class="lesson-item" onclick="show('demo-2')"><span class="lesson-num">▶</span><h4>Demo — Create a filter</h4><span class="lesson-type demo">Interactive Demo</span></div>
+      <div class="lesson-item" onclick="show('m3')"><span class="lesson-num">→</span><h4>Next: Module 3 — Collaboration</h4></div>
+    </div>
+  </section>
+
+  <!-- MODULE 3 -->
+  <section id="m3" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 3</div>
+      <h1>Collaboration & Teams</h1>
+      <p>How to use the Business workspace to collaborate effectively.</p>
+    </div>
+    <h2 class="section-title">3.1 — Workspace Management</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Business plan features</h4><p>Unlimited projects, team inbox, Reporting (Activity Log), admin controls, and priority support.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Admin controls</h4><p>Manage who can create projects, invite members, and view workspace activity. Settings → Members.</p></div></div>
+    </div>
+    <h2 class="section-title">3.2 — Assignment & Comments</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Assign a task</h4><p>While creating: press <code>+</code> and type a name. On existing tasks: hover → assignee icon → select from dropdown.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Comments & @mentions</h4><p>Click the speech bubble on any task. Type <code>@name</code> to notify. Attach files or links to keep context in one place.</p></div></div>
+    </div>
+    <h2 class="section-title">3.3 — Integrations</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Email to task</h4><p>Forward emails to your Todoist inbox address to create tasks automatically.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Calendar sync</h4><p>Connect Google Calendar or Outlook. Settings → Integrations → Calendar.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Slack</h4><p>Create tasks from Slack messages and receive Todoist notifications in channels.</p></div></div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('m4')"><span class="lesson-num">→</span><h4>Next: Module 4 — Advanced</h4></div>
+    </div>
+  </section>
+
+  <!-- MODULE 4 -->
+  <section id="m4" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 4</div>
+      <h1>Advanced & Best Practices</h1>
+      <p>Workflow design, templates, productivity tracking, and troubleshooting.</p>
+    </div>
+    <h2 class="section-title">4.1 — Workflow Design</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Start with real workflows</h4><p>Map out 3–4 recurring workflows your team actually does (e.g., client onboarding, sprint planning, content publishing) and model each as a project template.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Project templates</h4><p>Build a model project, then duplicate it for new initiatives. Browse ready-made templates at <a href="https://todoist.com/templates" target="_blank" style="color:var(--red)">todoist.com/templates</a>.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Naming conventions</h4><p>Agree team-wide on naming for projects, labels, and sections. Consistency makes filters much more powerful.</p></div></div>
+    </div>
+    <h2 class="section-title">4.2 — Reporting & Tracking</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Reporting (Activity Log)</h4><p>Shows all completed tasks across the workspace. Filter by user, project, and date. Use it to spot adoption gaps or track output.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Karma</h4><p>Tracks personal task completion streaks. Optional but useful as a motivator for individuals during onboarding.</p></div></div>
+    </div>
+    <h2 class="section-title">4.3 — Troubleshooting</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Common issues</h4><ul><li>Tasks not syncing: close and reopen the app, check connection</li><li>Missing tasks: check Reporting — tasks may be completed, not deleted</li><li>Notification overload: adjust per-project notification settings</li></ul></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Where to get help</h4><p><a href="https://todoist.com/help" target="_blank" style="color:var(--red)">Help Center</a> · <a href="https://todoist.com/contact" target="_blank" style="color:var(--red)">Contact support</a></p></div></div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('trainer')"><span class="lesson-num">→</span><h4>Next: Train the Trainer</h4></div>
+    </div>
+  </section>
+
+  <!-- TRAIN THE TRAINER -->
+  <section id="trainer" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Train your team</div>
+      <h1>Running Training Sessions</h1>
+      <p>Everything you need to deliver effective onboarding for your team.</p>
+    </div>
+    <div class="tip-box"><strong>Trainer tip</strong><p>The best sessions are hands-on. Use the Interactive Demos as live walkthroughs — let participants click through them on their own screens.</p></div>
+    <h2 class="section-title">How to run your first session</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Set up before the session</h4><p>Create a shared "Training" project in the workspace as a sandbox for practice.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Share the onboarding guide in advance</h4><p>Send the PDF (Resources section) 24h before. Ask participants to create an account and join the workspace first.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Walk through the demos live</h4><p>Use the "Create folders" and "Create a filter" demos in Module 2. Let participants follow on their own screens.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><h4>Focus on 3–4 core workflows</h4><p>Don't try to cover everything. Tailor to what your team will actually use daily. Depth over breadth.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><h4>End with a real task</h4><p>Ask everyone to add one real work task in Todoist before the session closes. Nothing reinforces training like doing it for real.</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-content"><h4>Schedule a follow-up</h4><p>A 30-minute check-in 1 week later makes a big difference. Adoption drops without a follow-up touchpoint.</p></div></div>
+    </div>
+    <h2 class="section-title">Session formats</h2>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">⚡</div><h3>Quick Start (30 min)</h3><p>Account setup, adding tasks, joining the workspace. Best for time-constrained teams.</p><span class="badge">Beginner</span></div>
+      <div class="card"><div class="card-icon">🎯</div><h3>Core Training (90 min)</h3><p>Full feature overview with hands-on practice. Tasks, projects, collaboration, filters.</p><span class="badge">Standard</span></div>
+      <div class="card"><div class="card-icon">🏋️</div><h3>Deep Dive (half day)</h3><p>For Champions and admins. Workflow design, templates, integrations.</p><span class="badge">Advanced</span></div>
+    </div>
+  </section>
+
+  <!-- DEMO 1 -->
+  <section id="demo-1" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 2</div>
+      <h1>Create folders</h1>
+      <p>Walk through this demo with your team in Module 2 — Core Features.</p>
+    </div>
+    <div class="tip-box"><strong>How to use</strong><p>Click through each step below. If the embed doesn't load, use the "Open in new tab" button and share the link with your team.</p></div>
+    <div class="demo-container">
+      <div class="demo-header">
+        <h3>Create folders</h3>
+        <div class="demo-actions">
+          <span class="demo-tag">Interactive</span>
+          <a class="demo-open-btn" href="https://app.arcade.software/flows/F8Ru2ezYKFhC2d6WqwsY/view" target="_blank">Open in new tab ↗</a>
+        </div>
+      </div>
+      <div class="demo-embed-wrapper">
+        <iframe src="https://demo.arcade.software/F8Ru2ezYKFhC2d6WqwsY?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Todoist Onboarding" allow="clipboard-write" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('demo-2')"><span class="lesson-num">→</span><h4>Next: Create a filter</h4></div>
+    </div>
+  </section>
+
+  <!-- DEMO 2 -->
+  <section id="demo-2" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Module 2</div>
+      <h1>Create a filter</h1>
+      <p>Walk through this demo with your team in Module 2 — Core Features.</p>
+    </div>
+    <div class="tip-box"><strong>How to use</strong><p>Click through each step below. If the embed doesn't load, use the "Open in new tab" button and share the link with your team.</p></div>
+    <div class="demo-container">
+      <div class="demo-header">
+        <h3>Create a filter</h3>
+        <div class="demo-actions">
+          <span class="demo-tag">Interactive</span>
+          <a class="demo-open-btn" href="https://app.arcade.software/flows/66JvkcM4F6A4ga8tO6hQ/view" target="_blank">Open in new tab ↗</a>
+        </div>
+      </div>
+      <div class="demo-embed-wrapper">
+        <iframe src="https://demo.arcade.software/66JvkcM4F6A4ga8tO6hQ?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Todoist Team Setup" allow="clipboard-write" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('resources')"><span class="lesson-num">→</span><h4>Next: Resources & Downloads</h4></div>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section id="resources" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Resources</div>
+      <h1>Downloads & Links</h1>
+    </div>
+    <h2 class="section-title">Documents</h2>
+    <div class="resource-list">
+      <a class="resource-item" href="./Todoist Onboarding.pdf" target="_blank">
+        <span class="res-icon">📄</span>
+        <div class="res-info"><h4>Todoist for Teams — Onboarding Guide</h4><p>Share this with team members before their first training session.</p></div>
+        <span class="res-action">Open PDF →</span>
+      </a>
+    </div>
+    <h2 class="section-title">Interactive Demos</h2>
+    <div class="resource-list">
+      <div class="resource-item" onclick="show('demo-1')"><span class="res-icon">▶️</span><div class="res-info"><h4>Create folders</h4><p>Interactive demo — Module 2, Core Features.</p></div><span class="res-action">View →</span></div>
+      <div class="resource-item" onclick="show('demo-2')"><span class="res-icon">▶️</span><div class="res-info"><h4>Create a filter</h4><p>Interactive demo — Module 2, Core Features.</p></div><span class="res-action">View →</span></div>
+    </div>
+    <h2 class="section-title">Official Todoist</h2>
+    <div class="resource-list">
+      <a class="resource-item" href="https://todoist.com/help" target="_blank"><span class="res-icon">📚</span><div class="res-info"><h4>Help Center</h4><p>Official documentation for all features.</p></div><span class="res-action">Open →</span></a>
+      <a class="resource-item" href="https://todoist.com/templates" target="_blank"><span class="res-icon">🗂️</span><div class="res-info"><h4>Project Templates</h4><p>Ready-made templates for team workflows.</p></div><span class="res-action">Open →</span></a>
+      <a class="resource-item" href="https://todoist.com/integrations" target="_blank"><span class="res-icon">🔌</span><div class="res-info"><h4>Integrations</h4><p>Connect Todoist with your existing tools.</p></div><span class="res-action">Open →</span></a>
+    </div>
+  </section>
+
+
+  <!-- HELP CENTER INSIGHTS -->
+  <section id="help-center" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Resources</div>
+      <h1>Help Center Insights</h1>
+      <p>The 10 most-visited Help Center articles. Click any article to read it here in the portal.</p>
+    </div>
+
+    <h2 class="section-title">Top 10 most-read articles</h2>
+    <div class="article-list">
+      <div class="article-item" onclick="openHC('Use The Calendar Integration','https://www.todoist.com/help/articles/use-the-calendar-integration-rCqwLCt3G')">
+        <span class="article-rank">1</span>
+        <div class="article-info"><h4>Use The Calendar Integration</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Introduction To Filters','https://www.todoist.com/help/articles/introduction-to-filters-V98wIH')">
+        <span class="article-rank">2</span>
+        <div class="article-info"><h4>Introduction To Filters</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Get Started With Todoist','https://www.todoist.com/help/articles/get-started-with-todoist-OgNNJR')">
+        <span class="article-rank">3</span>
+        <div class="article-info"><h4>Get Started With Todoist</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Forward Emails To Todoist','https://www.todoist.com/help/articles/forward-emails-to-todoist-JPJ1V339')">
+        <span class="article-rank">4</span>
+        <div class="article-info"><h4>Forward Emails To Todoist</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Use The Inbox In Todoist','https://www.todoist.com/help/articles/use-the-inbox-in-todoist-HwHvYErS')">
+        <span class="article-rank">5</span>
+        <div class="article-info"><h4>Use The Inbox In Todoist</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Usage Limits In Todoist','https://www.todoist.com/help/articles/usage-limits-in-todoist-e5rcSY')">
+        <span class="article-rank">6</span>
+        <div class="article-info"><h4>Usage Limits In Todoist</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Dictate To Add Tasks With Ramble','https://www.todoist.com/help/articles/dictate-to-add-tasks-with-ramble-P1Raq7vVF')">
+        <span class="article-rank">7</span>
+        <div class="article-info"><h4>Dictate To Add Tasks With Ramble</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Customize Views In Todoist','https://www.todoist.com/help/articles/customize-views-in-todoist-AoHhBxFdZ')">
+        <span class="article-rank">8</span>
+        <div class="article-info"><h4>Customize Views In Todoist</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Introduction To Projects','https://www.todoist.com/help/articles/introduction-to-projects-TLTjNftLM')">
+        <span class="article-rank">9</span>
+        <div class="article-info"><h4>Introduction To Projects</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+      <div class="article-item" onclick="openHC('Changelog Entries From 2026','https://www.todoist.com/help/articles/changelog-entries-from-2026-HD3jJAtLd')">
+        <span class="article-rank">10</span>
+        <div class="article-info"><h4>Changelog Entries From 2026</h4></div>
+        <span class="res-action">Read →</span>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- PRACTICE MODE -->
+  <section id="practice" class="page-section">
+
+    <!-- LEFT: article list / article view -->
+    <div class="prac-left">
+      <div class="prac-header">
+        <h2>Practice Mode</h2>
+        <p>Select an article to read it here, then follow the guided steps in Todoist.</p>
+      </div>
+
+      <!-- Exercise -->
+      <div style="flex:1; overflow-y:auto; padding:20px 22px;">
+
+        <div style="margin-bottom:18px;">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--gray-mid);margin-bottom:6px;">Exercise</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Create your first filter</div>
+          <div style="font-size:12px;color:var(--gray-mid);line-height:1.6;">Build a filter that shows all <strong>P1 tasks due today</strong> assigned to you. Follow the steps, then try it in the demo on the right.</div>
+        </div>
+
+        <div class="tip-box" style="margin-bottom:20px;">
+          <strong>Target query</strong>
+          <p style="font-family:monospace;font-size:13px;color:var(--red-dark);margin-top:4px;">today & p1 & assigned to: me</p>
+        </div>
+
+        <div class="prac-step">
+          <div class="prac-step-num">1</div>
+          <div class="prac-step-body">
+            <strong>Open Filters &amp; Labels</strong>
+            <p>Click <strong>Filters &amp; Labels</strong> in the left sidebar of Todoist.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">2</div>
+          <div class="prac-step-body">
+            <strong>Add a new filter</strong>
+            <p>Click the <strong>+</strong> icon next to Filters to open the Add filter window.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">3</div>
+          <div class="prac-step-body">
+            <strong>Name your filter</strong>
+            <p>Type <code>My urgent tasks today</code> in the Name field.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">4</div>
+          <div class="prac-step-body">
+            <strong>Enter the query</strong>
+            <p>In the Query field, type:</p>
+            <p style="font-family:monospace;font-size:13px;background:var(--gray-light);padding:6px 10px;border-radius:6px;margin-top:6px;color:var(--red-dark);">today &amp; p1 &amp; assigned to: me</p>
+            <div class="prac-step-tip">
+              <strong>today</strong> — due today &nbsp;·&nbsp; <strong>&amp;</strong> — AND &nbsp;·&nbsp; <strong>p1</strong> — priority 1 &nbsp;·&nbsp; <strong>assigned to: me</strong> — your tasks only
+            </div>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">5</div>
+          <div class="prac-step-body">
+            <strong>Save the filter</strong>
+            <p>Click <strong>Add</strong>. The filter now appears under Filters &amp; Labels in your sidebar.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">6</div>
+          <div class="prac-step-body">
+            <strong>Test it</strong>
+            <p>Click the filter to see all P1 tasks due today that are assigned to you.</p>
+            <div class="prac-step-tip">💡 Want to go further? Try <code>(today | overdue) &amp; p1</code> to also catch overdue P1 tasks.</div>
+          </div>
+        </div>
+
+        <div class="prac-done">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Exercise complete — great work!
+        </div>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-border);">
+          <a href="https://www.todoist.com/help/articles/introduction-to-filters-V98wIH" target="_blank" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Read the full article ↗</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: tabs — Exercise steps | Todoist -->
+    <div class="prac-right">
+      <div class="prac-right-header">
+        <span>Todoist Sandbox</span>
+      </div>
+
+      <iframe
+        src="https://todoistsandbox.netlify.app"
+        title="Todoist Sandbox"
+        allow="clipboard-read; clipboard-write"
+        style="flex:1; border:none; width:100%;">
+      </iframe>
+    </div>
+
+  </section>
+
+  <!-- HC ARTICLE PANEL -->
+  <div class="hc-overlay" id="hc-overlay" onclick="closeHC()"></div>
+  <div class="hc-panel" id="hc-panel">
+    <div class="hc-panel-header">
+      <span class="hc-panel-title" id="hc-panel-title"></span>
+      <a class="hc-panel-newtab" id="hc-panel-newtab" href="#" target="_blank">Open in new tab ↗</a>
+      <button class="hc-panel-close" onclick="closeHC()">✕</button>
+    </div>
+    <iframe id="hc-iframe" src="" title="Help Center Article"></iframe>
+    <div class="hc-panel-blocked" id="hc-panel-blocked" style="display:none">
+      <p>This article can't be displayed inside the portal due to browser security restrictions.</p>
+      <a class="demo-open-btn" id="hc-blocked-link" href="#" target="_blank">Open in new tab ↗</a>
+    </div>
+  </div>
+
+</main>
+<script>
+  // Practice Mode — steps data
+  var pracSteps = {
+    'Use The Calendar Integration': [
+      { t: 'Open Settings', d: 'Go to Settings → Integrations → Calendar.' },
+      { t: 'Connect your calendar', d: 'Click "Connect Google Calendar" or "Connect Outlook" and complete the authorisation flow.' },
+      { t: 'Enable sync', d: 'Turn on the option to show tasks with due dates in your calendar.' },
+      { t: 'Verify', d: 'Create a task with a due date and check that it appears in your calendar.', tip: 'Recurring tasks show up as recurring events in your calendar.' }
+    ],
+    'Introduction To Filters': [
+      { t: 'Go to Filters & Labels', d: 'Click "Filters & Labels" in the left sidebar.' },
+      { t: 'Create a new filter', d: 'Click + and give the filter a name, e.g. "Today\'s priorities".' },
+      { t: 'Enter the query', d: 'Use the query: <code>today & p1</code> to see only P1 tasks due today.' },
+      { t: 'Save and test', d: 'Save the filter and click it to see the results.', tip: 'Also try: <code>assigned to: me & overdue</code> to catch overdue tasks.' }
+    ],
+    'Get Started With Todoist': [
+      { t: 'Add your first task', d: 'Press <code>Q</code> anywhere to open Quick Add. Type a real task from your work.' },
+      { t: 'Use natural language', d: 'Include a due date directly in the text, e.g. "Client call tomorrow at 3pm".' },
+      { t: 'Set a priority', d: 'Type <code>p1</code> in the text or use the flag icon to set the priority level.' },
+      { t: 'Complete the task', d: 'Click the circle to the left of the task to mark it as complete.' }
+    ],
+    'Forward Emails To Todoist': [
+      { t: 'Open a project', d: 'Go to an existing project (or create a new one called "Email Tasks").' },
+      { t: 'Find the project email address', d: 'Click the three dots ⋯ at the top right → "Email tasks to this project".' },
+      { t: 'Copy the address', d: 'Copy the unique email address generated by Todoist.' },
+      { t: 'Forward an email', d: 'Go to your inbox and forward an email to that address. Return to Todoist and confirm the task appeared.', tip: 'The email subject line becomes the task name.' }
+    ],
+    'Use The Inbox In Todoist': [
+      { t: 'Add 3 tasks to the Inbox', d: 'Press <code>Q</code> and add 3 tasks without specifying a project — they land in the Inbox automatically.' },
+      { t: 'Open the Inbox', d: 'Click "Inbox" in the left sidebar.' },
+      { t: 'Process your tasks', d: 'For each task: move it to the right project, set a due date, or delete it if it\'s not needed.' },
+      { t: 'Reach Inbox zero', d: 'Goal: empty Inbox. Every task should have a home and a date.', tip: 'Set aside 5–10 minutes each day to process your Inbox.' }
+    ],
+    'Usage Limits In Todoist': [
+      { t: 'Check your plan', d: 'Go to Settings → Account to see your active plan and current limits.' },
+      { t: 'Review active projects', d: 'Count how many active projects you have. The Beginner plan allows 5, Pro allows 300.' },
+      { t: 'Check collaborators', d: 'Open a shared project and review who the collaborators are and their roles.' },
+      { t: 'Plan an upgrade if needed', d: 'If you\'re approaching the limits, consider the Pro or Business plan for your team.', tip: 'Completed tasks do not count toward the active task limit.' }
+    ],
+    'Dictate To Add Tasks With Ramble': [
+      { t: 'Open Todoist on mobile', d: 'Use the iOS or Android app on your device.' },
+      { t: 'Find the Ramble button', d: 'Look for the microphone icon in the task-add bar.' },
+      { t: 'Dictate a task', d: 'Press and hold, then say a full task, e.g. "Prepare the presentation for next Friday".' },
+      { t: 'Review and save', d: 'Check that the date and project were recognised correctly, then save.', tip: 'You can also specify the project: "Add to the Marketing project..."' }
+    ],
+    'Customize Views In Todoist': [
+      { t: 'Open a project', d: 'Go to a project that has at least a few tasks.' },
+      { t: 'Change the layout', d: 'Click the layout button (top right) and switch from List to Board (Kanban).' },
+      { t: 'Group by priority', d: 'In the layout menu, select "Group by" → Priority to see tasks organised by urgency.' },
+      { t: 'Save the view', d: 'View settings are saved per project. Try different layouts for different projects.', tip: 'The Calendar view is particularly useful for projects with many due dates.' }
+    ],
+    'Introduction To Projects': [
+      { t: 'Create a project', d: 'Click + next to "My Projects" → give it a name, choose a colour and icon.' },
+      { t: 'Add sections', d: 'Click the three dots ⋯ → "Add section". Create: "To Do", "In Progress", "Done".' },
+      { t: 'Add tasks to sections', d: 'Add at least one task per section using the + below each section name.' },
+      { t: 'Share the project', d: 'Click the share icon (top right) and invite a colleague by email.', tip: 'You can duplicate a well-structured project to use it as a template for future initiatives.' }
+    ],
+    'Changelog Entries From 2026': [
+      { t: 'Read the latest entries', d: 'Scroll through the changelog and read the last 5 entries to understand recent changes.' },
+      { t: 'Identify relevant features', d: 'Note any features that could be useful for your team.' },
+      { t: 'Create a follow-up task', d: 'Press <code>Q</code> and create a task like "Share new feature X with the team — Friday".' },
+      { t: 'Share with your team', d: 'Copy the link to an entry and share it in your team\'s Slack channel or email.', tip: 'Keeping your team informed about new features is part of the Champion role.' }
+    ]
+  };
+
+
+  function openPracArticle(el, title, url) {
+    document.querySelectorAll('.prac-list-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+
+    // Load article in left iframe
+    document.getElementById('prac-article-name').textContent = title;
+    document.getElementById('prac-newtab').href = url;
+    document.getElementById('prac-blocked-link').href = url;
+    var frame = document.getElementById('prac-article-frame');
+    var blocked = document.getElementById('prac-blocked-article');
+    frame.style.display = 'block';
+    blocked.style.display = 'none';
+    frame.src = url;
+    frame.onerror = function() { frame.style.display = 'none'; blocked.style.display = 'flex'; };
+    frame.onload = function() {
+      try {
+        var doc = frame.contentDocument || frame.contentWindow.document;
+        if (!doc || doc.body === null || doc.body.innerHTML === '') { frame.style.display = 'none'; blocked.style.display = 'flex'; }
+      } catch(e) {}
+    };
+    document.getElementById('prac-list').style.display = 'none';
+    document.getElementById('prac-article-view').classList.add('visible');
+
+    // Render steps on right
+    var steps = pracSteps[title] || [];
+    var html = '<div class="prac-steps-panel"><h3>' + title + '</h3><p class="prac-steps-sub">Follow these steps in your Todoist account</p>';
+    steps.forEach(function(s, i) {
+      html += '<div class="prac-step"><div class="prac-step-num">' + (i+1) + '</div><div class="prac-step-body"><strong>' + s.t + '</strong><p>' + s.d + '</p>' + (s.tip ? '<div class="prac-step-tip">💡 ' + s.tip + '</div>' : '') + '</div></div>';
+    });
+    html += '<div class="prac-done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Exercise complete — great work!</div></div>';
+    document.getElementById('prac-right-body').innerHTML = html;
+  }
+
+  function closePracArticle() {
+    document.getElementById('prac-article-view').classList.remove('visible');
+    document.getElementById('prac-list').style.display = 'block';
+    document.getElementById('prac-article-frame').src = '';
+    document.querySelectorAll('.prac-list-item').forEach(i => i.classList.remove('selected'));
+    document.getElementById('prac-right-body').innerHTML = '';
+  }
+
+  function openHC(title, url) {
+    document.getElementById('hc-panel-title').textContent = title;
+    document.getElementById('hc-panel-newtab').href = url;
+    document.getElementById('hc-blocked-link').href = url;
+    var iframe = document.getElementById('hc-iframe');
+    var blocked = document.getElementById('hc-panel-blocked');
+    iframe.style.display = 'block';
+    blocked.style.display = 'none';
+    iframe.src = url;
+    iframe.onerror = function() {
+      iframe.style.display = 'none';
+      blocked.style.display = 'flex';
+    };
+    // Detect X-Frame-Options block (fires load but with empty content on some browsers)
+    iframe.onload = function() {
+      try {
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || doc.body === null || doc.body.innerHTML === '') {
+          iframe.style.display = 'none';
+          blocked.style.display = 'flex';
+        }
+      } catch(e) {
+        // Cross-origin — assume it loaded fine, browser will show its own error
+      }
+    };
+    document.getElementById('hc-panel').classList.add('open');
+    document.getElementById('hc-overlay').classList.add('open');
+  }
+  function closeHC() {
+    document.getElementById('hc-panel').classList.remove('open');
+    document.getElementById('hc-overlay').classList.remove('open');
+    document.getElementById('hc-iframe').src = '';
+  }
+  function show(id) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    const t = document.getElementById(id);
+    if (t) t.classList.add('active');
+    document.querySelectorAll('#sidebar nav a').forEach(a => {
+      a.classList.remove('active');
+      if ((a.getAttribute('onclick') || '').includes("'" + id + "'")) a.classList.add('active');
+    });
+    window.scrollTo(0, 0);
+    return false;
+  }
+</script>
+</body>
+</html>
