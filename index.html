@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.5 (2026-04-14) — Convert TM4 (Collaborate) and TM5 (Filters) to split-view with sandbox. TM5 now subsumes the old standalone "Filter exercise" (removed exercise-2; sidebar Practice group dropped; Module 2 and Champion overview card repoint to TM5). Single shared sandbox iframe overlay across TM2–TM5 — state now persists when switching modules (add a task in TM2, still there in TM3).
   v1.4 (2026-04-14) — Fix "page not found" on sandbox iframes caused by multiple hidden sections racing on the same origin; switched all sandbox iframes to data-src + just-in-time loading in show(). Consolidated filter exercises: removed the Arcade "Guided" variant, kept a single sandbox exercise renamed to "Filter exercise".
   v1.3 (2026-04-14) — TM2 (Add & complete tasks) and TM3 (Plan your day) converted to split-view with the Todoist sandbox embedded on the right — team members practice in place instead of tab-switching. Sidebar stays visible; left-pane prev/next lesson nav.
   v1.2 (2026-04-14) — Role-branched portal: first-visit role gate (Champion vs Team Member), new 5-lesson Team Member track ("Your first week with Todoist") built from the Onboarding PDF + HC collaboration article, shared filter exercise, "Share with your team" distribution card (copy link / preview) on the Champion overview, role-aware sidebar, ?role=team URL param.
@@ -205,6 +206,13 @@
     .dist-btn.primary { background: var(--red); color: #fff; border-color: var(--red); }
     .dist-btn.primary:hover { background: var(--red-dark); border-color: var(--red-dark); }
     .dist-btn.copied { background: #15803d; color: #fff; border-color: #15803d; }
+
+    /* Shared sandbox overlay — one iframe, persists state across all split-view lessons */
+    #sandbox-overlay { position: fixed; top: 0; right: 0; bottom: 0; left: calc(var(--sidebar-width) + 400px); display: none; flex-direction: column; z-index: 50; background: var(--white); border-left: 1px solid var(--gray-border); }
+    body.sandbox-visible #sandbox-overlay { display: flex; }
+    #sandbox-overlay .so-header { padding: 13px 18px; background: #1c1917; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+    #sandbox-overlay .so-header .so-hint { font-size: 11px; font-weight: 500; opacity: 0.6; }
+    #sandbox-overlay iframe { flex: 1; border: none; width: 100%; }
   </style>
 </head>
 <body data-role="champion">
@@ -241,9 +249,6 @@
     <a href="#" onclick="return show('tm4')"><span class="icon">💬</span> 4 — Collaborate</a>
     <a href="#" onclick="return show('tm5')"><span class="icon">🔍</span> 5 — Filters</a>
 
-    <div class="nav-label">Practice</div>
-    <a href="#" onclick="return show('exercise-2')"><span class="icon">🎯</span> Filter exercise</a>
-
     <div class="nav-label champion-only">Train your team</div>
     <a class="champion-only" href="#" onclick="return show('trainer')"><span class="icon">🎓</span> Running Sessions</a>
 
@@ -252,7 +257,7 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.4</span>Champion Portal</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.5</span>Champion Portal</div>
 </aside>
 
 <main id="main">
@@ -331,7 +336,7 @@
 
     <h2 class="section-title">Also in the portal</h2>
     <div class="card-grid">
-      <div class="card" onclick="show('exercise-2')">
+      <div class="card" onclick="show('tm5')">
         <div class="card-icon">🎯</div>
         <h3>Filter exercise</h3>
         <p>Hands-on practice in the live Todoist sandbox — build a P1 filter from scratch.</p>
@@ -396,18 +401,18 @@
         <span class="pnum">4</span>
         <div class="pbody">
           <h3>Collaborate with your team</h3>
-          <p>Assign tasks, comment, and use @mentions to keep context in one place.</p>
+          <p>Find assignment, comments, and @mentions live in the sandbox.</p>
         </div>
-        <span class="pmeta">~5 min</span>
+        <span class="pmeta">~6 min · sandbox</span>
         <span class="parrow">→</span>
       </a>
       <a class="path-step" href="#" onclick="return show('tm5')">
         <span class="pnum">5</span>
         <div class="pbody">
           <h3>Find what matters with filters</h3>
-          <p>Build a custom view for the tasks that matter most — then practice it.</p>
+          <p>Build a P1 filter step-by-step in the sandbox.</p>
         </div>
-        <span class="pmeta">~8 min</span>
+        <span class="pmeta">~8 min · sandbox</span>
         <span class="parrow">→</span>
       </a>
     </div>
@@ -532,18 +537,6 @@
       </div>
     </div>
 
-    <div class="prac-right">
-      <div class="prac-right-header">
-        <span>Todoist Sandbox — Try adding tasks</span>
-      </div>
-      <iframe
-        data-src="https://todoistsandbox.netlify.app"
-        title="Todoist Sandbox — Add tasks"
-        allow="clipboard-read; clipboard-write"
-        loading="lazy"
-        style="flex:1; border:none; width:100%;">
-      </iframe>
-    </div>
   </section>
 
   <!-- TM3 — PLAN YOUR DAY (split-view) -->
@@ -613,93 +606,159 @@
       </div>
     </div>
 
-    <div class="prac-right">
-      <div class="prac-right-header">
-        <span>Todoist Sandbox — Explore the views</span>
-      </div>
-      <iframe
-        data-src="https://todoistsandbox.netlify.app"
-        title="Todoist Sandbox — Today / Upcoming / Calendar"
-        allow="clipboard-read; clipboard-write"
-        loading="lazy"
-        style="flex:1; border:none; width:100%;">
-      </iframe>
-    </div>
   </section>
 
-  <!-- TM4 — COLLABORATE -->
-  <section id="tm4" class="page-section">
-    <div class="page-header">
-      <div class="breadcrumb">Your first week · Lesson 4</div>
-      <h1>Collaborate with your team</h1>
-      <p>Hand work off, give feedback, and keep all task context in one place.</p>
-      <div class="module-meta">
-        <span class="mm-time">⏱ ~5 min</span>
-        <span class="mm-outcome">By the end: you can assign, comment, and @mention like a pro.</span>
+  <!-- TM4 — COLLABORATE (split-view) -->
+  <section id="tm4" class="page-section exercise-section">
+    <div class="prac-left">
+      <div class="prac-header">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Your first week · Lesson 4</div>
+        <h2>Collaborate with your team</h2>
+        <p>Find the collaboration controls in the sandbox on the right. You'll use them for real once you're in your team's workspace.</p>
+      </div>
+
+      <div style="flex:1; overflow-y:auto; padding:20px 22px;">
+
+        <div style="margin-bottom:18px;">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--gray-mid);margin-bottom:6px;">Goal</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Know where assignment, comments, and @mentions live</div>
+          <div style="font-size:12px;color:var(--gray-mid);line-height:1.6;">The sandbox has no real teammates, but every collaboration control is here. Find them so you're not hunting around on day one.</div>
+        </div>
+
+        <div class="prac-step">
+          <div class="prac-step-num">1</div>
+          <div class="prac-step-body">
+            <strong>Open a task</strong>
+            <p>Click any task name in the sandbox to open its detail view.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">2</div>
+          <div class="prac-step-body">
+            <strong>Find the assignee button</strong>
+            <p>Look for a person-silhouette icon near the due date. In a real shared project, this is where you pick who owns the task.</p>
+            <div class="prac-step-tip">You can also assign while creating: press <code>+</code> in the task editor and type a name.</div>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">3</div>
+          <div class="prac-step-body">
+            <strong>Open comments</strong>
+            <p>Click the speech-bubble icon to open the comment thread on the task.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">4</div>
+          <div class="prac-step-body">
+            <strong>Try writing a comment</strong>
+            <p>Post an update, paste a link, or drag in a file. Everything stays tied to the task.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">5</div>
+          <div class="prac-step-body">
+            <strong>Try @mention</strong>
+            <p>Type <code>@</code> in a comment. The mention dropdown appears — in your real workspace, this is how you ping a teammate.</p>
+            <div class="prac-step-tip">The sandbox has no teammates to tag, so the dropdown will be empty. That's expected.</div>
+          </div>
+        </div>
+
+        <div class="prac-done">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          You know where everything lives. One lesson to go.
+        </div>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-border);display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <a href="#" onclick="return show('tm3')" style="font-size:12px;color:var(--gray-mid);font-weight:600;text-decoration:none;">← Previous</a>
+          <a href="#" onclick="return show('tm5')" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Next: Filters →</a>
+        </div>
+
       </div>
     </div>
 
-    <h2 class="section-title">4.1 — Assign a task</h2>
-    <div class="steps">
-      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>While creating</h4><p>Press <code>+</code> inside the task editor, type a teammate's name, and pick them from the dropdown.</p></div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>On an existing task</h4><p>Hover the task → click the person silhouette → select the assignee.</p></div></div>
-    </div>
-
-    <h2 class="section-title">4.2 — Comment on tasks</h2>
-    <div class="steps">
-      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Open comments</h4><p>Click the speech-bubble icon on any task to open its comment thread.</p></div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Post updates</h4><p>Ask questions, drop links, attach files. Everything stays tied to the task.</p></div></div>
-    </div>
-
-    <h2 class="section-title">4.3 — @mentions</h2>
-    <div class="steps">
-      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Ping a teammate</h4><p>Type <code>@name</code> in a comment. The person you mention gets a notification.</p></div></div>
-    </div>
-
-    <div class="tip-box">
-      <strong>Keep context in one place</strong>
-      <p>Use task comments like a mini chat thread. It beats losing the conversation in Slack or email — and new joiners can read the whole history.</p>
-    </div>
-
-    <div class="lesson-list">
-      <div class="lesson-item" onclick="show('tm5')"><span class="lesson-num">→</span><h4>Next: Find what matters with filters</h4></div>
-    </div>
   </section>
 
-  <!-- TM5 — FILTERS + EXERCISE -->
-  <section id="tm5" class="page-section">
-    <div class="page-header">
-      <div class="breadcrumb">Your first week · Lesson 5</div>
-      <h1>Find what matters with filters</h1>
-      <p>A filter is a saved search across every project. Build one view, reuse it forever.</p>
-      <div class="module-meta">
-        <span class="mm-time">⏱ ~3 min + hands-on exercise</span>
-        <span class="mm-outcome">By the end: you've built a filter in a guided demo and in a live sandbox.</span>
+  <!-- TM5 — FILTERS (split-view, subsumes old filter exercise) -->
+  <section id="tm5" class="page-section exercise-section">
+    <div class="prac-left">
+      <div class="prac-header">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Your first week · Lesson 5</div>
+        <h2>Find what matters with filters</h2>
+        <p>A filter is a saved search across every project. Build one, reuse it forever.</p>
+      </div>
+
+      <div style="flex:1; overflow-y:auto; padding:20px 22px;">
+
+        <div style="margin-bottom:18px;">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--gray-mid);margin-bottom:6px;">Goal</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Build a filter that shows your P1 tasks</div>
+          <div style="font-size:12px;color:var(--gray-mid);line-height:1.6;">One custom view that surfaces every priority-1 task across all your projects. Do it in the sandbox on the right.</div>
+        </div>
+
+        <div class="tip-box" style="margin-bottom:20px;">
+          <strong>Common filter queries</strong>
+          <p style="margin-top:6px;"><code>today &amp; assigned to: me</code> · your day only.<br><code>p1</code> · every top-priority task.<br><code>overdue &amp; assigned to: me</code> · catch-up mode.<br><code>@waiting</code> · anything labelled "waiting."</p>
+        </div>
+
+        <div class="prac-step">
+          <div class="prac-step-num">1</div>
+          <div class="prac-step-body">
+            <strong>Open Filters &amp; Labels</strong>
+            <p>Click <strong>Filters &amp; Labels</strong> in the left sidebar of the sandbox.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">2</div>
+          <div class="prac-step-body">
+            <strong>Add a new filter</strong>
+            <p>Click the <strong>+</strong> icon next to Filters to open the Add-filter window.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">3</div>
+          <div class="prac-step-body">
+            <strong>Name it</strong>
+            <p>Type <code>My P1 tasks</code> in the Name field.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">4</div>
+          <div class="prac-step-body">
+            <strong>Enter the query</strong>
+            <p>In the Query field, type:</p>
+            <p style="font-family:monospace;font-size:13px;background:var(--gray-light);padding:6px 10px;border-radius:6px;margin-top:6px;color:var(--red-dark);">p1</p>
+            <div class="prac-step-tip"><strong>p1</strong> — priority 1, the highest priority level in Todoist (shown in red).</div>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">5</div>
+          <div class="prac-step-body">
+            <strong>Save</strong>
+            <p>Click <strong>Add</strong>. The filter appears under Filters &amp; Labels in the sidebar.</p>
+          </div>
+        </div>
+        <div class="prac-step">
+          <div class="prac-step-num">6</div>
+          <div class="prac-step-body">
+            <strong>Test it</strong>
+            <p>Click the filter to see all your P1 tasks gathered in a single view.</p>
+            <div class="prac-step-tip">💡 Want to go further? Try <code>p1 &amp; today</code> to narrow to P1 tasks due today.</div>
+          </div>
+        </div>
+
+        <div class="prac-done">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          You've finished your first week with Todoist.
+        </div>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-border);display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <a href="#" onclick="return show('tm4')" style="font-size:12px;color:var(--gray-mid);font-weight:600;text-decoration:none;">← Previous</a>
+          <a href="https://www.todoist.com/help/articles/introduction-to-filters-V98wIH" target="_blank" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Read the full article ↗</a>
+        </div>
+
       </div>
     </div>
 
-    <h2 class="section-title">5.1 — Why filters matter</h2>
-    <div class="steps">
-      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Cross-project views</h4><p>Instead of jumping between projects, a filter surfaces exactly the tasks you need — e.g. "my P1 work," "everything I'm waiting on," "overdue and mine."</p></div></div>
-    </div>
-
-    <h2 class="section-title">5.2 — Common filter queries</h2>
-    <div class="steps">
-      <div class="step"><div class="step-num">→</div><div class="step-content"><h4><code>today &amp; assigned to: me</code></h4><p>Your day, only the items on your plate.</p></div></div>
-      <div class="step"><div class="step-num">→</div><div class="step-content"><h4><code>p1</code></h4><p>All top-priority tasks across every project.</p></div></div>
-      <div class="step"><div class="step-num">→</div><div class="step-content"><h4><code>overdue &amp; assigned to: me</code></h4><p>Catch-up mode.</p></div></div>
-      <div class="step"><div class="step-num">→</div><div class="step-content"><h4><code>@waiting</code></h4><p>Anything you've labelled as waiting on someone else.</p></div></div>
-    </div>
-
-    <h2 class="section-title">5.3 — Practice</h2>
-    <div class="lesson-list">
-      <div class="lesson-item" onclick="show('exercise-2')"><span class="lesson-num">🎯</span><h4>Filter exercise — build a P1 view in the sandbox</h4><span class="lesson-type demo">Hands-on</span></div>
-    </div>
-
-    <div class="tip-box">
-      <strong>You've finished the first week</strong>
-      <p>That's the core toolkit. Anything else — templates, integrations, keyboard shortcuts — is icing. Ask your champion if you want to go deeper.</p>
-    </div>
   </section>
 
   <!-- WHY -->
@@ -824,7 +883,7 @@
     <div class="lesson-list">
       <div class="lesson-item" onclick="show('demo-1')"><span class="lesson-num">▶</span><h4>Demo — Create folders</h4><span class="lesson-type demo">Interactive Demo</span></div>
       <div class="lesson-item" onclick="show('demo-2')"><span class="lesson-num">▶</span><h4>Demo — Create a filter</h4><span class="lesson-type demo">Interactive Demo</span></div>
-      <div class="lesson-item" onclick="show('exercise-2')"><span class="lesson-num">🎯</span><h4>Filter exercise — build a P1 view in the sandbox</h4><span class="lesson-type demo">Hands-on</span></div>
+      <div class="lesson-item" onclick="show('tm5')"><span class="lesson-num">🎯</span><h4>Filter exercise — build a P1 view in the sandbox</h4><span class="lesson-type demo">Hands-on</span></div>
       <div class="lesson-item" onclick="show('m3')"><span class="lesson-num">→</span><h4>Next: Enable your team</h4></div>
     </div>
   </section>
@@ -1061,104 +1120,19 @@
   </section>
 
 
-  <!-- FILTER EXERCISE — Sandbox (live Todoist) -->
-  <section id="exercise-2" class="page-section exercise-section">
-
-    <div class="prac-left">
-      <div class="prac-header">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Filter exercise</div>
-        <h2>Create a filter</h2>
-        <p>Practice in the live Todoist sandbox on the right. No safety rails — your changes stay in your browser.</p>
-      </div>
-
-      <div style="flex:1; overflow-y:auto; padding:20px 22px;">
-
-        <div style="margin-bottom:18px;">
-          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--gray-mid);margin-bottom:6px;">Goal</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Build a filter that shows your P1 tasks</div>
-          <div style="font-size:12px;color:var(--gray-mid);line-height:1.6;">Create a custom view that surfaces every priority-1 task across all your projects.</div>
-        </div>
-
-        <div class="tip-box" style="margin-bottom:20px;">
-          <strong>Target query</strong>
-          <p style="font-family:monospace;font-size:13px;color:var(--red-dark);margin-top:4px;">p1</p>
-        </div>
-
-        <div class="prac-step">
-          <div class="prac-step-num">1</div>
-          <div class="prac-step-body">
-            <strong>Open Filters &amp; Labels</strong>
-            <p>Click <strong>Filters &amp; Labels</strong> in the left sidebar of Todoist.</p>
-          </div>
-        </div>
-        <div class="prac-step">
-          <div class="prac-step-num">2</div>
-          <div class="prac-step-body">
-            <strong>Add a new filter</strong>
-            <p>Click the <strong>+</strong> icon next to Filters to open the Add filter window.</p>
-          </div>
-        </div>
-        <div class="prac-step">
-          <div class="prac-step-num">3</div>
-          <div class="prac-step-body">
-            <strong>Name your filter</strong>
-            <p>Type <code>My P1 tasks</code> in the Name field.</p>
-          </div>
-        </div>
-        <div class="prac-step">
-          <div class="prac-step-num">4</div>
-          <div class="prac-step-body">
-            <strong>Enter the query</strong>
-            <p>In the Query field, type:</p>
-            <p style="font-family:monospace;font-size:13px;background:var(--gray-light);padding:6px 10px;border-radius:6px;margin-top:6px;color:var(--red-dark);">p1</p>
-            <div class="prac-step-tip">
-              <strong>p1</strong> — priority 1, the highest priority level in Todoist (shown in red).
-            </div>
-          </div>
-        </div>
-        <div class="prac-step">
-          <div class="prac-step-num">5</div>
-          <div class="prac-step-body">
-            <strong>Save the filter</strong>
-            <p>Click <strong>Add</strong>. The filter now appears under Filters &amp; Labels in your sidebar.</p>
-          </div>
-        </div>
-        <div class="prac-step">
-          <div class="prac-step-num">6</div>
-          <div class="prac-step-body">
-            <strong>Test it</strong>
-            <p>Click the filter to see all your P1 tasks gathered in a single view.</p>
-            <div class="prac-step-tip">💡 Want to go further? Try <code>p1 &amp; today</code> to narrow it down to P1 tasks due today.</div>
-          </div>
-        </div>
-
-        <div class="prac-done">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Exercise complete — great work!
-        </div>
-
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-border);display:flex;justify-content:space-between;align-items:center;gap:12px;">
-          <a href="https://www.todoist.com/help/articles/introduction-to-filters-V98wIH" target="_blank" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Read the full article ↗</a>
-        </div>
-
-      </div>
+  <!-- SHARED SANDBOX OVERLAY — one iframe reused across all TM sandbox lessons so state persists -->
+  <div id="sandbox-overlay" aria-hidden="true">
+    <div class="so-header">
+      <span>Todoist Sandbox — Live</span>
+      <span class="so-hint">Your workspace persists across lessons</span>
     </div>
-
-    <div class="prac-right">
-      <div class="prac-right-header">
-        <span>Todoist Sandbox — Live</span>
-      </div>
-
-      <iframe
-        data-src="https://todoistsandbox.netlify.app"
-        title="Todoist Sandbox — Live"
-        allow="clipboard-read; clipboard-write"
-        loading="lazy"
-        style="flex:1; border:none; width:100%;">
-      </iframe>
-    </div>
-
-  </section>
+    <iframe
+      id="shared-sandbox"
+      src="https://todoistsandbox.netlify.app"
+      title="Todoist Sandbox"
+      allow="clipboard-read; clipboard-write">
+    </iframe>
+  </div>
 
   <!-- ROLE GATE MODAL -->
   <div class="role-gate" id="role-gate">
@@ -1233,21 +1207,18 @@
     document.getElementById('hc-overlay').classList.remove('open');
     document.getElementById('hc-iframe').src = '';
   }
+  const SANDBOX_SECTIONS = new Set(['tm2', 'tm3', 'tm4', 'tm5']);
+
   function show(id) {
     document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
     const t = document.getElementById(id);
-    if (t) {
-      t.classList.add('active');
-      // Just-in-time iframe loading: only load iframes when their section is visible,
-      // preventing concurrent loads of the same sandbox origin from racing.
-      t.querySelectorAll('iframe[data-src]').forEach(ifr => {
-        if (!ifr.src) ifr.src = ifr.getAttribute('data-src');
-      });
-    }
+    if (t) t.classList.add('active');
     document.querySelectorAll('#sidebar nav a').forEach(a => {
       a.classList.remove('active');
       if ((a.getAttribute('onclick') || '').includes("'" + id + "'")) a.classList.add('active');
     });
+    // Toggle the shared sandbox overlay — one persistent iframe reused across TM sandbox lessons.
+    document.body.classList.toggle('sandbox-visible', SANDBOX_SECTIONS.has(id));
     window.scrollTo(0, 0);
     return false;
   }
