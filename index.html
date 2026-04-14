@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.9 (2026-04-14) — Switch [portal] diagnostic logs from console.log to console.warn so they show under the console's default filter level (Info was hidden by default).
   v1.8 (2026-04-14) — Debug "role gate not appearing in incognito": move the role-gate modal out of <main> to be a direct child of <body> (eliminates stacking-context risk), bump z-index to 9999, add -webkit-backdrop-filter for Safari, and log [portal] lifecycle messages so the console tells us which branch initRole took.
   v1.7 (2026-04-14) — Harden role-gate init: wrap localStorage + URLSearchParams in try/catch so the role modal always opens on first visit even when the browser blocks storage access (Safari private mode, strict cookie policies, content blockers).
   v1.6 (2026-04-14) — Convert TM1 to a sandbox UI tour ("Get to know Todoist"): sidebar/views/projects walkthrough instead of directing users out to todoist.com as the first step. The real-account "sign in and join your team" step becomes a prominent closing callout. Every Team Member lesson (TM1–TM5) now lives inside the shared sandbox.
@@ -260,7 +261,7 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.8</span>Champion Portal</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.9</span>Champion Portal</div>
 </aside>
 
 <main id="main">
@@ -1303,7 +1304,7 @@
       var gate = document.getElementById('role-gate');
       if (gate) {
         gate.classList.add('open');
-        console.log('[portal] role-gate opened (first visit)');
+        console.warn('[portal] role-gate opened (first visit)');
       } else {
         console.warn('[portal] role-gate element not found');
       }
@@ -1312,7 +1313,7 @@
       var params = new URLSearchParams(location.search);
       var roleParam = params.get('role');
       if (roleParam === 'team' || roleParam === 'champion') {
-        console.log('[portal] role from URL:', roleParam);
+        console.warn('[portal] role from URL:', roleParam);
         setRole(roleParam);
         return;
       }
@@ -1321,7 +1322,7 @@
     var saved = null;
     try { saved = localStorage.getItem('portal_role'); } catch (e) { console.warn('[portal] localStorage blocked', e); }
     if (saved === 'team' || saved === 'champion') {
-      console.log('[portal] role from storage:', saved);
+      console.warn('[portal] role from storage:', saved);
       document.body.setAttribute('data-role', saved);
       if (saved === 'team') show('tm-overview');
       return;
