@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.7 (2026-04-14) — Harden role-gate init: wrap localStorage + URLSearchParams in try/catch so the role modal always opens on first visit even when the browser blocks storage access (Safari private mode, strict cookie policies, content blockers).
   v1.6 (2026-04-14) — Convert TM1 to a sandbox UI tour ("Get to know Todoist"): sidebar/views/projects walkthrough instead of directing users out to todoist.com as the first step. The real-account "sign in and join your team" step becomes a prominent closing callout. Every Team Member lesson (TM1–TM5) now lives inside the shared sandbox.
   v1.5 (2026-04-14) — Convert TM4 (Collaborate) and TM5 (Filters) to split-view with sandbox. TM5 now subsumes the old standalone "Filter exercise" (removed exercise-2; sidebar Practice group dropped; Module 2 and Champion overview card repoint to TM5). Single shared sandbox iframe overlay across TM2–TM5 — state now persists when switching modules (add a task in TM2, still there in TM3).
   v1.4 (2026-04-14) — Fix "page not found" on sandbox iframes caused by multiple hidden sections racing on the same origin; switched all sandbox iframes to data-src + just-in-time loading in show(). Consolidated filter exercises: removed the Arcade "Guided" variant, kept a single sandbox exercise renamed to "Filter exercise".
@@ -258,7 +259,7 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.6</span>Champion Portal</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.7</span>Champion Portal</div>
 </aside>
 
 <main id="main">
@@ -1268,7 +1269,7 @@
 
   function setRole(role) {
     if (role !== 'champion' && role !== 'team') return;
-    localStorage.setItem('portal_role', role);
+    try { localStorage.setItem('portal_role', role); } catch (e) { /* Safari private mode etc. */ }
     document.body.setAttribute('data-role', role);
     document.getElementById('role-gate').classList.remove('open');
     show(role === 'team' ? 'tm-overview' : 'overview');
@@ -1296,20 +1297,28 @@
 
   // Initialize role on load
   (function initRole() {
-    const params = new URLSearchParams(location.search);
-    const roleParam = params.get('role');
-    if (roleParam === 'team' || roleParam === 'champion') {
-      setRole(roleParam);
-      return;
+    function openGate() {
+      var gate = document.getElementById('role-gate');
+      if (gate) gate.classList.add('open');
     }
-    const saved = localStorage.getItem('portal_role');
+    try {
+      var params = new URLSearchParams(location.search);
+      var roleParam = params.get('role');
+      if (roleParam === 'team' || roleParam === 'champion') {
+        setRole(roleParam);
+        return;
+      }
+    } catch (e) { /* ignore — fall through to gate */ }
+
+    var saved = null;
+    try { saved = localStorage.getItem('portal_role'); } catch (e) { /* private mode */ }
     if (saved === 'team' || saved === 'champion') {
       document.body.setAttribute('data-role', saved);
       if (saved === 'team') show('tm-overview');
       return;
     }
-    // First visit — show modal
-    document.getElementById('role-gate').classList.add('open');
+    // First visit (or any failure reading storage) — show the role gate
+    openGate();
   })();
 </script>
 </body>
