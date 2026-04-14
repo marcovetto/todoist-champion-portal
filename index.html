@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.14 (2026-04-14) — Illustration in the Champion overview banner: tandem-bicycle artwork (./images/tandem-onboarding.png) replaces the 🚀 emoji. Hero switched from the red-gradient treatment to a light cream-peach banner so the illustration doesn't fight the backdrop. First image asset introduces the ./images/ folder.
   v1.13 (2026-04-14) — Add "Your team will ask about this" — a champion-facing primer for the five themes that dominate team-member support tickets (sync, notifications, shared project visibility, broken invites, member/admin permissions). Ready answers, not a team-facing FAQ — framed so champions respond quickly without priming their team with problem lists. Sidebar entry under "Train your team"; linked from Week 3 of the 4-week plan.
   v1.12 (2026-04-14) — Add two tactical Champion pages based on support-data + case-study research: a 10-minute Quickstart (workspace + one teammate + one shared project + three real tasks — matches Zoom/Asana "start small" evidence) and a 4-week rollout plan (pilot → kickoff → check-in → measure). Sidebar entries under "Start here" and a "Plan your rollout" card row on the Champion overview.
   v1.11 (2026-04-14) — Add ?reset=1 URL param: clears the saved role and opens the gate. Useful for testing the first-visit experience without having to close every incognito window or open the console.
@@ -73,6 +74,19 @@
     .hero-xl h1 { font-size: 32px; font-weight: 800; line-height: 1.15; letter-spacing: -0.6px; color: #fff; margin-bottom: 10px; }
     .hero-xl p { font-size: 15px; opacity: 0.92; line-height: 1.65; max-width: 540px; }
     .hero-xl .hero-icon { font-size: 68px; }
+
+    /* Illustrated hero — light, illustration-led banner for the Champion overview */
+    .hero-illustrated { background: linear-gradient(135deg, #fff8f3 0%, #fdf0ed 100%); border-radius: 20px; padding: 36px 44px; display: flex; align-items: center; gap: 32px; margin-bottom: 40px; border: 1px solid var(--red-light); box-shadow: var(--shadow-sm); color: var(--gray-dark); }
+    .hero-illustrated .hero-text { flex: 1; min-width: 0; }
+    .hero-illustrated .hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--red); margin-bottom: 10px; opacity: 1; }
+    .hero-illustrated h1 { font-size: 32px; font-weight: 800; line-height: 1.15; letter-spacing: -0.6px; color: var(--gray-dark); margin-bottom: 10px; }
+    .hero-illustrated p { font-size: 15px; color: var(--gray-mid); line-height: 1.65; max-width: 440px; opacity: 1; }
+    .hero-illustrated img.hero-illustration { width: 360px; max-width: 42%; flex-shrink: 0; height: auto; display: block; }
+    @media (max-width: 860px) {
+      .hero-illustrated { flex-direction: column-reverse; text-align: center; padding: 28px; }
+      .hero-illustrated img.hero-illustration { width: 100%; max-width: 420px; }
+      .hero-illustrated p { max-width: 100%; margin: 0 auto; }
+    }
 
     .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
     .card { background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); padding: 24px; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow-sm); }
@@ -268,20 +282,20 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.13</span>Champion Portal</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.14</span>Champion Portal</div>
 </aside>
 
 <main id="main">
 
   <!-- OVERVIEW (Champion) -->
   <section id="overview" class="page-section active champion-only">
-    <div class="hero hero-xl">
-      <div class="hero-icon">🚀</div>
-      <div>
+    <div class="hero-illustrated">
+      <div class="hero-text">
         <div class="hero-eyebrow">Champion Portal</div>
         <h1>Five easy steps to onboard your team</h1>
         <p>A champion's playbook for rolling out Todoist. Follow it end-to-end, or jump to the step you need most.</p>
       </div>
+      <img class="hero-illustration" src="./images/tandem-onboarding.png" alt="Three teammates riding a tandem bicycle together, pedalling in sync">
     </div>
 
     <div class="distribute">
