@@ -135,6 +135,20 @@
     .hc-panel-blocked p { font-size: 14px; color: var(--gray-mid); line-height: 1.6; }
     .hc-overlay { display: none; position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 199; backdrop-filter: blur(2px); }
     .hc-overlay.open { display: block; }
+
+    .module-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+    .module-meta .mm-time { display: inline-flex; align-items: center; gap: 4px; padding: 4px 11px; background: var(--red-light); color: var(--red); border-radius: 99px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .module-meta .mm-outcome { font-size: 13px; color: var(--gray-mid); line-height: 1.55; }
+
+    .path { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+    .path-step { display: flex; align-items: center; gap: 18px; background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); padding: 18px 22px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); cursor: pointer; transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s; }
+    .path-step:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: #ddd8d2; }
+    .path-step .pnum { width: 36px; height: 36px; border-radius: 50%; background: var(--red); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+    .path-step .pbody { flex: 1; min-width: 0; }
+    .path-step .pbody h3 { font-size: 15px; font-weight: 700; margin-bottom: 3px; letter-spacing: -0.1px; }
+    .path-step .pbody p { font-size: 13px; color: var(--gray-mid); line-height: 1.55; }
+    .path-step .pmeta { font-size: 11px; font-weight: 600; color: var(--red); padding: 4px 11px; background: var(--red-light); border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+    .path-step .parrow { font-size: 16px; color: var(--gray-mid); flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -150,12 +164,13 @@
   <nav>
     <div class="nav-label">Start here</div>
     <a href="#" class="active" onclick="return show('overview')"><span class="icon">🏠</span> Overview</a>
+    <a href="#" onclick="return show('why')"><span class="icon">🧭</span> Define your why</a>
 
     <div class="nav-label">Full Course</div>
-    <a href="#" onclick="return show('m1')"><span class="icon">📗</span> Module 1 — Fundamentals</a>
-    <a href="#" onclick="return show('m2')"><span class="icon">📘</span> Module 2 — Core Features</a>
-    <a href="#" onclick="return show('m3')"><span class="icon">📙</span> Module 3 — Collaboration</a>
-    <a href="#" onclick="return show('m4')"><span class="icon">📕</span> Module 4 — Advanced</a>
+    <a href="#" onclick="return show('m1')"><span class="icon">📗</span> 1 — Set up workspace</a>
+    <a href="#" onclick="return show('m2')"><span class="icon">📘</span> 2 — Design workflows</a>
+    <a href="#" onclick="return show('m3')"><span class="icon">📙</span> 3 — Enable your team</a>
+    <a href="#" onclick="return show('m4')"><span class="icon">📕</span> 4 — Measure &amp; sustain</a>
 
     <div class="nav-label">Exercises</div>
     <a href="#" onclick="return show('exercise-1')"><span class="icon">🎯</span> Exercise 1 — Guided</a>
@@ -178,36 +193,145 @@
     <div class="page-header">
       <div class="breadcrumb">Champion Portal</div>
       <h1>The Todoist Team Champion Hub</h1>
-      <p>The essential one-stop resource for driving successful team adoption.</p>
+      <p>Your 5-step path to rolling out Todoist to your team. Follow it in order, or jump to the step you need.</p>
     </div>
+
+    <h2 class="section-title">Your rollout path</h2>
+    <div class="path">
+      <a class="path-step" href="#" onclick="return show('why')">
+        <span class="pnum">0</span>
+        <div class="pbody">
+          <h3>Define your why</h3>
+          <p>Capture the problem you're solving and what success looks like before you roll out.</p>
+        </div>
+        <span class="pmeta">~5 min</span>
+        <span class="parrow">→</span>
+      </a>
+      <a class="path-step" href="#" onclick="return show('m1')">
+        <span class="pnum">1</span>
+        <div class="pbody">
+          <h3>Set up your workspace</h3>
+          <p>Create the workspace, invite the team, and organise it into folders.</p>
+        </div>
+        <span class="pmeta">~10 min</span>
+        <span class="parrow">→</span>
+      </a>
+      <a class="path-step" href="#" onclick="return show('m2')">
+        <span class="pnum">2</span>
+        <div class="pbody">
+          <h3>Design your workflows</h3>
+          <p>Model the work your team actually does — tasks, projects, labels, filters.</p>
+        </div>
+        <span class="pmeta">~15 min</span>
+        <span class="parrow">→</span>
+      </a>
+      <a class="path-step" href="#" onclick="return show('m3')">
+        <span class="pnum">3</span>
+        <div class="pbody">
+          <h3>Enable your team</h3>
+          <p>Assignments, comments, and the integrations your team already depends on.</p>
+        </div>
+        <span class="pmeta">~10 min</span>
+        <span class="parrow">→</span>
+      </a>
+      <a class="path-step" href="#" onclick="return show('m4')">
+        <span class="pnum">4</span>
+        <div class="pbody">
+          <h3>Measure &amp; sustain adoption</h3>
+          <p>Track who's using it, build templates, and handle the common questions.</p>
+        </div>
+        <span class="pmeta">~10 min</span>
+        <span class="parrow">→</span>
+      </a>
+    </div>
+
+    <h2 class="section-title">Also in the portal</h2>
     <div class="card-grid">
-      <div class="card" onclick="show('m1')">
-        <div class="card-icon">📚</div>
-        <h3>Training Resources</h3>
-        <p>Short, targeted guides for your team's common workflows.</p>
-        <span class="badge">Guides</span>
-      </div>
-      <div class="card" onclick="show('m2')">
-        <div class="card-icon">🔦</div>
-        <h3>Feature Spotlights</h3>
-        <p>Quick deep dives into the most important features for team productivity.</p>
-        <span class="badge blue">Deep Dives</span>
+      <div class="card" onclick="show('exercise-1')">
+        <div class="card-icon">🎯</div>
+        <h3>Hands-on exercises</h3>
+        <p>Guided walkthrough and live Todoist sandbox — practice before training your team.</p>
+        <span class="badge">Exercises</span>
       </div>
       <div class="card" onclick="show('trainer')">
-        <div class="card-icon">🗺️</div>
-        <h3>Rollout Toolkit</h3>
-        <p>Clear, step-by-step guidance to manage the adoption process and serve as your team's primary contact for setup and best practices.</p>
+        <div class="card-icon">🎓</div>
+        <h3>Running training sessions</h3>
+        <p>Session formats and a six-step playbook for your first team workshop.</p>
         <span class="badge green">Toolkit</span>
       </div>
+      <div class="card" onclick="show('help-center')">
+        <div class="card-icon">📊</div>
+        <h3>Top Help Center articles</h3>
+        <p>The 10 articles your team is most likely to ask about.</p>
+        <span class="badge blue">Insights</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section id="why" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Start</div>
+      <h1>Define your why</h1>
+      <p>Adoption sticks when people know why change matters. Before setting anything up, capture the reason your team needs Todoist.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~5 min</span>
+        <span class="mm-outcome">By the end: a one-page rollout plan you can share with your team.</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">Answer four questions</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>What problem are we solving?</h4>
+          <p>Missed deadlines? Work scattered across email, Slack, and docs? Unclear priorities? Write it in one sentence.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Who is the rollout for?</h4>
+          <p>How many people, which teams, and who's likely to be skeptical? Plan for the skeptics — they're your real measure of success.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>What does success look like in 30 / 60 / 90 days?</h4>
+          <p>Examples: <em>80% of the team logs in weekly</em>; <em>all sprint tasks live in Todoist</em>; <em>no more "where is that task?" messages</em>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>What's our timeline?</h4>
+          <p>Pick a date for the kickoff session, a check-in one week later, and a 30-day review.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Champion tip</strong>
+      <p>Share your answers with your manager before the rollout starts. A two-minute alignment conversation now prevents a two-week detour later.</p>
+    </div>
+
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('m1')"><span class="lesson-num">→</span><h4>Next: Set up your workspace</h4></div>
     </div>
   </section>
 
   <!-- MODULE 1 -->
   <section id="m1" class="page-section">
     <div class="page-header">
-      <div class="breadcrumb">Champion Portal · Module 1</div>
-      <h1>Todoist Fundamentals</h1>
-      <p>Understand what Todoist is, how it's structured, and how to set up a workspace for your team.</p>
+      <div class="breadcrumb">Champion Portal · Step 1</div>
+      <h1>Set up your workspace</h1>
+      <p>Understand what Todoist is, how it's structured, and how to set up a workspace your team can join.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~10 min</span>
+        <span class="mm-outcome">By the end: a workspace ready for your team — folders, members, and a training sandbox.</span>
+      </div>
     </div>
     <h2 class="section-title">1.1 — What is Todoist?</h2>
     <div class="steps">
@@ -230,16 +354,20 @@
       <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Available on all platforms</h4><p>Web, macOS, Windows, iOS, Android. Experience is consistent. Keyboard shortcuts vary slightly on mobile.</p></div></div>
     </div>
     <div class="lesson-list">
-      <div class="lesson-item" onclick="show('m2')"><span class="lesson-num">→</span><h4>Next: Module 2 — Core Features</h4></div>
+      <div class="lesson-item" onclick="show('m2')"><span class="lesson-num">→</span><h4>Next: Design your workflows</h4></div>
     </div>
   </section>
 
   <!-- MODULE 2 -->
   <section id="m2" class="page-section">
     <div class="page-header">
-      <div class="breadcrumb">Champion Portal · Module 2</div>
-      <h1>Core Features</h1>
-      <p>A deep dive into the features your team will use every day.</p>
+      <div class="breadcrumb">Champion Portal · Step 2</div>
+      <h1>Design your workflows</h1>
+      <p>Tasks, projects, labels, and filters — the building blocks for modelling the work your team actually does.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~15 min</span>
+        <span class="mm-outcome">By the end: you can model your team's real work and find it again with filters.</span>
+      </div>
     </div>
     <h2 class="section-title">2.1 — Tasks</h2>
     <div class="steps">
@@ -264,16 +392,20 @@
       <div class="lesson-item" onclick="show('demo-2')"><span class="lesson-num">▶</span><h4>Demo — Create a filter</h4><span class="lesson-type demo">Interactive Demo</span></div>
       <div class="lesson-item" onclick="show('exercise-1')"><span class="lesson-num">🎯</span><h4>Exercise — Create a filter (Guided)</h4><span class="lesson-type">Exercise · Arcade</span></div>
       <div class="lesson-item" onclick="show('exercise-2')"><span class="lesson-num">🪟</span><h4>Exercise — Create a filter (Sandbox)</h4><span class="lesson-type">Exercise · Live</span></div>
-      <div class="lesson-item" onclick="show('m3')"><span class="lesson-num">→</span><h4>Next: Module 3 — Collaboration</h4></div>
+      <div class="lesson-item" onclick="show('m3')"><span class="lesson-num">→</span><h4>Next: Enable your team</h4></div>
     </div>
   </section>
 
   <!-- MODULE 3 -->
   <section id="m3" class="page-section">
     <div class="page-header">
-      <div class="breadcrumb">Champion Portal · Module 3</div>
-      <h1>Collaboration & Teams</h1>
-      <p>How to use the Business workspace to collaborate effectively.</p>
+      <div class="breadcrumb">Champion Portal · Step 3</div>
+      <h1>Enable your team</h1>
+      <p>Assignments, comments, and integrations — how to make Todoist the place your team actually collaborates.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~10 min</span>
+        <span class="mm-outcome">By the end: you can assign work, keep context in one place, and connect the tools your team already uses.</span>
+      </div>
     </div>
     <h2 class="section-title">3.1 — Workspace Management</h2>
     <div class="steps">
@@ -292,16 +424,20 @@
       <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Slack</h4><p>Create tasks from Slack messages and receive Todoist notifications in channels.</p></div></div>
     </div>
     <div class="lesson-list">
-      <div class="lesson-item" onclick="show('m4')"><span class="lesson-num">→</span><h4>Next: Module 4 — Advanced</h4></div>
+      <div class="lesson-item" onclick="show('m4')"><span class="lesson-num">→</span><h4>Next: Measure &amp; sustain adoption</h4></div>
     </div>
   </section>
 
   <!-- MODULE 4 -->
   <section id="m4" class="page-section">
     <div class="page-header">
-      <div class="breadcrumb">Champion Portal · Module 4</div>
-      <h1>Advanced & Best Practices</h1>
-      <p>Workflow design, templates, productivity tracking, and troubleshooting.</p>
+      <div class="breadcrumb">Champion Portal · Step 4</div>
+      <h1>Measure &amp; sustain adoption</h1>
+      <p>Templates, reporting, and troubleshooting — keep momentum past the kickoff week.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~10 min</span>
+        <span class="mm-outcome">By the end: you can track adoption, reuse what works, and handle the most common questions.</span>
+      </div>
     </div>
     <h2 class="section-title">4.1 — Workflow Design</h2>
     <div class="steps">
@@ -354,7 +490,7 @@
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Module 2</div>
       <h1>Create folders</h1>
-      <p>Walk through this demo with your team in Module 2 — Core Features.</p>
+      <p>Walk through this demo with your team in Step 2 — Design your workflows.</p>
     </div>
     <div class="tip-box"><strong>How to use</strong><p>Click through each step below. If the embed doesn't load, use the "Open in new tab" button and share the link with your team.</p></div>
     <div class="demo-container">
@@ -379,7 +515,7 @@
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Module 2</div>
       <h1>Create a filter</h1>
-      <p>Walk through this demo with your team in Module 2 — Core Features.</p>
+      <p>Walk through this demo with your team in Step 2 — Design your workflows.</p>
     </div>
     <div class="tip-box"><strong>How to use</strong><p>Click through each step below. If the embed doesn't load, use the "Open in new tab" button and share the link with your team.</p></div>
     <div class="demo-container">
@@ -415,8 +551,8 @@
     </div>
     <h2 class="section-title">Interactive Demos</h2>
     <div class="resource-list">
-      <div class="resource-item" onclick="show('demo-1')"><span class="res-icon">▶️</span><div class="res-info"><h4>Create folders</h4><p>Interactive demo — Module 2, Core Features.</p></div><span class="res-action">View →</span></div>
-      <div class="resource-item" onclick="show('demo-2')"><span class="res-icon">▶️</span><div class="res-info"><h4>Create a filter</h4><p>Interactive demo — Module 2, Core Features.</p></div><span class="res-action">View →</span></div>
+      <div class="resource-item" onclick="show('demo-1')"><span class="res-icon">▶️</span><div class="res-info"><h4>Create folders</h4><p>Interactive demo — Step 2, Design your workflows.</p></div><span class="res-action">View →</span></div>
+      <div class="resource-item" onclick="show('demo-2')"><span class="res-icon">▶️</span><div class="res-info"><h4>Create a filter</h4><p>Interactive demo — Step 2, Design your workflows.</p></div><span class="res-action">View →</span></div>
     </div>
     <h2 class="section-title">Official Todoist</h2>
     <div class="resource-list">
@@ -498,7 +634,7 @@
 
     <div class="prac-left">
       <div class="prac-header">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Module 2 · Exercise 1</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Step 2 · Exercise 1</div>
         <h2>Create a filter — Guided</h2>
         <p>Follow the recorded walkthrough on the right. Every click is mapped — perfect for your first try.</p>
       </div>
@@ -599,7 +735,7 @@
 
     <div class="prac-left">
       <div class="prac-header">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Module 2 · Exercise 2</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray-mid);margin-bottom:4px;">Step 2 · Exercise 2</div>
         <h2>Create a filter — Sandbox</h2>
         <p>Now do it for real in a live Todoist environment. No script — free practice.</p>
       </div>
@@ -672,7 +808,7 @@
 
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-border);display:flex;justify-content:space-between;align-items:center;gap:12px;">
           <a href="https://www.todoist.com/help/articles/introduction-to-filters-V98wIH" target="_blank" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Read the full article ↗</a>
-          <a href="#" onclick="return show('m3')" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Next: Module 3 →</a>
+          <a href="#" onclick="return show('m3')" style="font-size:12px;color:var(--red);font-weight:600;text-decoration:none;">Next: Enable your team →</a>
         </div>
 
       </div>
