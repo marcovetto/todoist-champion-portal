@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.11 (2026-04-14) — Add ?reset=1 URL param: clears the saved role and opens the gate. Useful for testing the first-visit experience without having to close every incognito window or open the console.
   v1.10 (2026-04-14) — Remove [portal] diagnostic console.warn calls now that the incognito issue is diagnosed (stale localStorage across incognito session reuse). Keep the hardened try/catch blocks and the body-level modal placement from v1.7/v1.8.
   v1.9 (2026-04-14) — Switch [portal] diagnostic logs from console.log to console.warn so they show under the console's default filter level (Info was hidden by default).
   v1.8 (2026-04-14) — Debug "role gate not appearing in incognito": move the role-gate modal out of <main> to be a direct child of <body> (eliminates stacking-context risk), bump z-index to 9999, add -webkit-backdrop-filter for Safari, and log [portal] lifecycle messages so the console tells us which branch initRole took.
@@ -262,7 +263,7 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.10</span>Champion Portal</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.11</span>Champion Portal</div>
 </aside>
 
 <main id="main">
@@ -1307,6 +1308,13 @@
     }
     try {
       var params = new URLSearchParams(location.search);
+      // ?reset=1 — clear any saved role and show the gate. Handy for testing.
+      if (params.get('reset') === '1') {
+        try { localStorage.removeItem('portal_role'); } catch (e) {}
+        try { history.replaceState({}, '', location.pathname); } catch (e) {}
+        openGate();
+        return;
+      }
       var roleParam = params.get('role');
       if (roleParam === 'team' || roleParam === 'champion') {
         setRole(roleParam);
