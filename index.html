@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.13 (2026-04-14) — Add "Your team will ask about this" — a champion-facing primer for the five themes that dominate team-member support tickets (sync, notifications, shared project visibility, broken invites, member/admin permissions). Ready answers, not a team-facing FAQ — framed so champions respond quickly without priming their team with problem lists. Sidebar entry under "Train your team"; linked from Week 3 of the 4-week plan.
   v1.12 (2026-04-14) — Add two tactical Champion pages based on support-data + case-study research: a 10-minute Quickstart (workspace + one teammate + one shared project + three real tasks — matches Zoom/Asana "start small" evidence) and a 4-week rollout plan (pilot → kickoff → check-in → measure). Sidebar entries under "Start here" and a "Plan your rollout" card row on the Champion overview.
   v1.11 (2026-04-14) — Add ?reset=1 URL param: clears the saved role and opens the gate. Useful for testing the first-visit experience without having to close every incognito window or open the console.
   v1.10 (2026-04-14) — Remove [portal] diagnostic console.warn calls now that the incognito issue is diagnosed (stale localStorage across incognito session reuse). Keep the hardened try/catch blocks and the body-level modal placement from v1.7/v1.8.
@@ -260,13 +261,14 @@
 
     <div class="nav-label champion-only">Train your team</div>
     <a class="champion-only" href="#" onclick="return show('trainer')"><span class="icon">🎓</span> Running Sessions</a>
+    <a class="champion-only" href="#" onclick="return show('team-questions')"><span class="icon">💬</span> Team questions</a>
 
     <div class="nav-label">Resources</div>
     <a href="#" onclick="return show('resources')"><span class="icon">📎</span> Downloads &amp; Links</a>
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.12</span>Champion Portal</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.13</span>Champion Portal</div>
 </aside>
 
 <main id="main">
@@ -970,7 +972,7 @@
     <h2 class="section-title">Week 3 — Check in</h2>
     <div class="steps">
       <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Read the Activity Log</h4><p>Reporting → filter by project. Who's active? Who hasn't touched it?</p></div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>1:1 with anyone who's stalled</h4><p>Not to pressure — to unblock. "What stopped you?" is a better question than "Why aren't you using it?"</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>1:1 with anyone who's stalled</h4><p>Not to pressure — to unblock. "What stopped you?" is a better question than "Why aren't you using it?" The <a href="#" onclick="return show('team-questions')" style="color:var(--red);font-weight:600;">Team questions</a> page has ready answers for the five themes you'll hear most.</p></div></div>
       <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Collect feedback</h4><p>What's confusing? What's missing? What convention needs changing? Note it.</p></div></div>
       <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Goal</h4><p>Identify the 10–20% who need a short follow-up session.</p></div></div>
     </div>
@@ -1152,6 +1154,59 @@
       <div class="card"><div class="card-icon">⚡</div><h3>Quick Start (30 min)</h3><p>Account setup, adding tasks, joining the workspace. Best for time-constrained teams.</p><span class="badge">Beginner</span></div>
       <div class="card"><div class="card-icon">🎯</div><h3>Core Training (90 min)</h3><p>Full feature overview with hands-on practice. Tasks, projects, collaboration, filters.</p><span class="badge">Standard</span></div>
       <div class="card"><div class="card-icon">🏋️</div><h3>Deep Dive (half day)</h3><p>For Champions and admins. Workflow design, templates, integrations.</p><span class="badge">Advanced</span></div>
+    </div>
+  </section>
+
+  <!-- TEAM QUESTIONS -->
+  <section id="team-questions" class="page-section champion-only">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Train your team</div>
+      <h1>Your team will ask about this</h1>
+      <p>Five themes that make up the bulk of team-member questions in the first weeks. Quick answers so you can respond in 30 seconds, not half an hour.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~6 min read</span>
+        <span class="mm-outcome">By the end: you have ready answers for the five most common team questions.</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">1. "My tasks aren't syncing"</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Most common cause: stale local state</h4><p>Have them close and reopen the app, or log out and back in. Sync catches up within seconds.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Missing a specific task?</h4><p>Check if a filter or view is hiding it. Click <strong>Inbox</strong> or the project where the task lives — not a filtered view — to confirm it exists.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Mobile-only sync issues</h4><p>Check battery-saver and background-refresh settings. iOS Low-Power Mode and Android Battery Optimization will throttle sync.</p></div></div>
+    </div>
+
+    <h2 class="section-title">2. "I'm not getting notifications"</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Check Todoist's notification settings</h4><p>Settings → Notifications — make sure <strong>Comments &amp; mentions</strong> is enabled for the channels they want (email, push, or both).</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Check per-project notifications</h4><p>Each project has its own dial. Three-dot menu on a project → <strong>Notifications</strong>. Projects default to "All activity" or "Only @mentions."</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Check device permissions</h4><p>On mobile, the OS may have blocked Todoist from sending push notifications. Settings → Apps → Todoist → Notifications.</p></div></div>
+    </div>
+
+    <h2 class="section-title">3. "I can't see the shared project"</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>They haven't been added yet</h4><p>Open the project → <strong>Share</strong> icon → invite them by email. Workspace membership alone doesn't auto-add them to every project.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>The project is in a restricted folder</h4><p>If the folder is restricted, they need explicit access. Workspace Settings → Folders → adjust the folder's permission, or invite them directly to the project.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>They're looking in the wrong workspace</h4><p>Remind them to click the team workspace name in the sidebar — not My Projects. Shared projects only appear inside the team workspace.</p></div></div>
+    </div>
+
+    <h2 class="section-title">4. "My invite link isn't working"</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Ask them to create their account first</h4><p>Invites sometimes fail for users who don't yet have a Todoist account. Have them sign up at <code>todoist.com</code> with the same email, then click the invite link again.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Resend the invite</h4><p>Workspace Settings → Members → find the pending invite → <strong>Resend</strong>. Old invite links expire.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Email typo?</h4><p>Check the address in the pending invites list. Typos in the invite email are the single most common silent failure.</p></div></div>
+    </div>
+
+    <h2 class="section-title">5. "What can I do as a member vs. an admin?"</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Members can</h4><p>Create and join projects, add and complete tasks, invite others to their own projects, use every product feature. In short: do the job.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Admins additionally can</h4><p>Manage workspace members, billing, folder order, workspace-level settings. Most teams need 1–2 admins, not everyone.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Promote someone</h4><p>Workspace Settings → Members → click the role next to their name → select <strong>Admin</strong>.</p></div></div>
+    </div>
+
+    <div class="tip-box">
+      <strong>A note on framing</strong>
+      <p>This page is for you, not your team. When a question comes up, answer it — don't forward them a list of "things that might go wrong." Priming new users with problem lists makes the product feel fragile.</p>
     </div>
   </section>
 
