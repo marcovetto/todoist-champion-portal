@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.12 (2026-04-14) — Add two tactical Champion pages based on support-data + case-study research: a 10-minute Quickstart (workspace + one teammate + one shared project + three real tasks — matches Zoom/Asana "start small" evidence) and a 4-week rollout plan (pilot → kickoff → check-in → measure). Sidebar entries under "Start here" and a "Plan your rollout" card row on the Champion overview.
   v1.11 (2026-04-14) — Add ?reset=1 URL param: clears the saved role and opens the gate. Useful for testing the first-visit experience without having to close every incognito window or open the console.
   v1.10 (2026-04-14) — Remove [portal] diagnostic console.warn calls now that the incognito issue is diagnosed (stale localStorage across incognito session reuse). Keep the hardened try/catch blocks and the body-level modal placement from v1.7/v1.8.
   v1.9 (2026-04-14) — Switch [portal] diagnostic logs from console.log to console.warn so they show under the console's default filter level (Info was hidden by default).
@@ -237,6 +238,8 @@
     <div class="nav-label champion-only">Start here</div>
     <a class="champion-only" href="#" onclick="return show('overview')"><span class="icon">🏠</span> Overview</a>
     <a class="champion-only" href="#" onclick="return show('why')"><span class="icon">🧭</span> Define your why</a>
+    <a class="champion-only" href="#" onclick="return show('quickstart')"><span class="icon">⚡</span> 10-min Quickstart</a>
+    <a class="champion-only" href="#" onclick="return show('rollout-plan')"><span class="icon">📆</span> 4-week rollout plan</a>
 
     <div class="nav-label team-only">Start here</div>
     <a class="team-only" href="#" onclick="return show('tm-overview')"><span class="icon">👋</span> Welcome</a>
@@ -263,7 +266,7 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.11</span>Champion Portal</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.12</span>Champion Portal</div>
 </aside>
 
 <main id="main">
@@ -288,6 +291,22 @@
       <div class="dist-actions">
         <button class="dist-btn" onclick="previewTeam()">Preview →</button>
         <button class="dist-btn primary" id="copy-team-link" onclick="copyTeamLink(this)">Copy link</button>
+      </div>
+    </div>
+
+    <h2 class="section-title">Plan your rollout</h2>
+    <div class="card-grid">
+      <div class="card" onclick="show('quickstart')">
+        <div class="card-icon">⚡</div>
+        <h3>10-minute Quickstart</h3>
+        <p>Invite one teammate and ship one shared project. Start small — expand later.</p>
+        <span class="badge">Fastest</span>
+      </div>
+      <div class="card" onclick="show('rollout-plan')">
+        <div class="card-icon">📆</div>
+        <h3>4-week rollout plan</h3>
+        <p>Paced week-by-week schedule from pilot to full team — what Zoom and Asana did.</p>
+        <span class="badge blue">Planning</span>
       </div>
     </div>
 
@@ -860,6 +879,117 @@
 
     <div class="lesson-list">
       <div class="lesson-item" onclick="show('m1')"><span class="lesson-num">→</span><h4>Next: Set up your workspace</h4></div>
+    </div>
+  </section>
+
+  <!-- QUICKSTART -->
+  <section id="quickstart" class="page-section champion-only">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Quickstart</div>
+      <h1>10-minute Quickstart</h1>
+      <p>Ship your first shared Todoist project in 10 minutes. Bring the rest of the team in later — start small is how Zoom and Asana did it.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~10 min</span>
+        <span class="mm-outcome">By the end: a live workspace with one teammate and one real shared project.</span>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Why start this small?</strong>
+      <p>Support data shows rollouts stall when champions try to add everyone at once. Getting one teammate working in Todoist proves the loop — then you expand with confidence.</p>
+    </div>
+
+    <h2 class="section-title">Step 1 — Create the workspace (3 min)</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Open Todoist</h4><p>Go to <code>todoist.com</code> and log in.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Create the workspace</h4><p>Click your workspace name in the sidebar → <em>Create or join a workspace</em>. Name it for your team or company.</p></div></div>
+    </div>
+
+    <h2 class="section-title">Step 2 — Invite one teammate (2 min)</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Pick one person</h4><p>Your most engaged early adopter — not a group of ten. One live user beats ten passive invitees every time.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Send the invite</h4><p>Workspace Settings → Members → enter their email → Invite. Give them admin or member — admin works fine for now.</p></div></div>
+    </div>
+
+    <h2 class="section-title">Step 3 — Create one shared project (3 min)</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Add a project</h4><p>Click <strong>+</strong> next to the workspace name → <em>Add project</em>. Pick a layout (List or Board) and a colour.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Name it for real work</h4><p>Something you'll actually use — "Q2 campaigns," not "Test." Real projects stick; sandbox projects get ignored.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Share with your teammate</h4><p>Share icon (top right) → enter their email → Invite.</p></div></div>
+    </div>
+
+    <h2 class="section-title">Step 4 — Add three real tasks (2 min)</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Use Quick Add</h4><p>Press <code>Q</code> from anywhere. Try:</p><p style="font-family:monospace;font-size:13px;background:var(--gray-light);padding:8px 12px;border-radius:6px;margin-top:6px;color:var(--red-dark);line-height:1.9;">Review draft fri 2pm p2<br>Weekly sync every monday 9am<br>Send invoice in 3 days</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Assign at least one</h4><p>Press <code>+</code> in the task editor and pick your teammate. Now they have something real on their plate.</p></div></div>
+    </div>
+
+    <div class="tip-box">
+      <strong>That's the minimum loop</strong>
+      <p>Workspace, one teammate, one shared project, one assigned task. When your teammate completes it and you both keep coming back, the rollout is working. Don't expand until it's working.</p>
+    </div>
+
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('rollout-plan')"><span class="lesson-num">→</span><h4>Next: 4-week rollout plan — how to expand from here</h4></div>
+    </div>
+  </section>
+
+  <!-- 4-WEEK ROLLOUT PLAN -->
+  <section id="rollout-plan" class="page-section champion-only">
+    <div class="page-header">
+      <div class="breadcrumb">Champion Portal · Rollout plan</div>
+      <h1>Your 4-week rollout plan</h1>
+      <p>A paced expansion from pilot to full team. Zoom and Asana went small-then-wide — big-bang rollouts stall because nobody has time to learn the tool and do their job.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~8 min read</span>
+        <span class="mm-outcome">By the end: a week-by-week schedule with clear goals you can paste into a Todoist project.</span>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Stagger, don't flood</strong>
+      <p>Adding 5 people in week 1 + 5 in week 2 costs the same as 10 on day one, but feels dramatically different to the team. Phased rollouts are correlated with ~30% higher adoption.</p>
+    </div>
+
+    <h2 class="section-title">Week 1 — Pilot (3–5 people)</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Champion + 2–4 early adopters only</h4><p>Keep it tight. These are the people who will debug weird stuff with you before the wider team sees it.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Create 1–2 shared projects</h4><p>For real work the pilot group is already doing. Don't invent new workflows yet.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Agree team conventions</h4><p>Priority meanings (what counts as P1?), label vocabulary, project naming. Write them down.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Goal</h4><p>Everyone in the pilot has a <em>live task they actually rely on</em> — not a test task.</p></div></div>
+    </div>
+
+    <h2 class="section-title">Week 2 — Kickoff</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Run your training session</h4><p>Use the <a href="#" onclick="return show('trainer')" style="color:var(--red);font-weight:600;">Running Sessions</a> playbook. Keep it to 30–60 minutes.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Invite via shared-project links, not admin mass-add</h4><p><strong>Why:</strong> people who join a live project engage differently from people who get a generic "You've been added" email. Slack's rollouts leaned on this and so should yours.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Share the Team Member track</h4><p>Copy the team link from the overview and drop it in your Slack / Twist / email kickoff message so new joiners can onboard themselves.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Goal</h4><p>Everyone has joined at least one project and added one task.</p></div></div>
+    </div>
+
+    <h2 class="section-title">Week 3 — Check in</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Read the Activity Log</h4><p>Reporting → filter by project. Who's active? Who hasn't touched it?</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>1:1 with anyone who's stalled</h4><p>Not to pressure — to unblock. "What stopped you?" is a better question than "Why aren't you using it?"</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Collect feedback</h4><p>What's confusing? What's missing? What convention needs changing? Note it.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Goal</h4><p>Identify the 10–20% who need a short follow-up session.</p></div></div>
+    </div>
+
+    <h2 class="section-title">Week 4 — Measure &amp; adjust</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Review adoption numbers</h4><p>Active users, tasks per person, completion rate. Compare to your Week 1 "why" — are you hitting it?</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Build the missing pieces</h4><p>Templates for recurring workflows, filters for cross-project views. Now you have enough data to know which ones matter.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Decide who to add next</h4><p>Another 5–10 people in week 5, or consolidate first? Let the data tell you.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Goal</h4><p>A rollout that keeps moving without you driving it every day.</p></div></div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Accidental-charge watch</strong>
+      <p>Inviting all seats on day one means billing for everyone immediately. A staggered rollout keeps seat count (and invoice) matched to actual usage.</p>
+    </div>
+
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('m1')"><span class="lesson-num">→</span><h4>Dig into the full 5-step path</h4></div>
     </div>
   </section>
 
