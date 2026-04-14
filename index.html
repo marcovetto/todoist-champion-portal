@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.2 (2026-04-14) — Role-branched portal: first-visit role gate (Champion vs Team Member), new 5-lesson Team Member track ("Your first week with Todoist") built from the Onboarding PDF + HC collaboration article, shared filter exercise, "Share with your team" distribution card (copy link / preview) on the Champion overview, role-aware sidebar, ?role=team URL param.
   v1.1 (2026-04-14) — Hero title "Five easy steps to onboard your team"; polished path cards (gradient numbers, connecting spine, hover accent); version badge in sidebar.
   v1.0 — Asana-inspired reframe: verb-led modules, Define your why, time/outcome per step, 5-step overview path.
   Bump the version on every change.
@@ -165,9 +166,46 @@
     .path-step .parrow { font-size: 18px; color: var(--gray-mid); flex-shrink: 0; transition: color 0.18s, transform 0.18s; }
 
     #sidebar .sidebar-footer .version-badge { display: inline-block; background: rgba(238,100,73,0.18); color: var(--red); padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px; margin-right: 6px; }
+    #sidebar .role-indicator { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.4); padding: 10px 18px 4px; }
+    #sidebar .role-indicator strong { color: rgba(255,255,255,0.85); font-weight: 700; }
+    #sidebar .role-switch { display: block; padding: 6px 18px 10px; font-size: 11px; color: rgba(255,255,255,0.45); text-decoration: underline; text-decoration-color: rgba(255,255,255,0.2); cursor: pointer; }
+    #sidebar .role-switch:hover { color: rgba(255,255,255,0.8); }
+
+    /* Role gating */
+    body[data-role="team"] .champion-only { display: none !important; }
+    body[data-role="champion"] .team-only { display: none !important; }
+
+    /* Role gate modal */
+    .role-gate { display: none; position: fixed; inset: 0; z-index: 400; background: rgba(28,25,23,0.55); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 24px; }
+    .role-gate.open { display: flex; }
+    .role-gate-card { background: var(--white); border-radius: 20px; max-width: 720px; width: 100%; padding: 44px 44px 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+    .role-gate-card .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+    .role-gate-card h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 8px; }
+    .role-gate-card > p { font-size: 14px; color: var(--gray-mid); line-height: 1.6; margin-bottom: 26px; }
+    .role-gate-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .role-option { background: var(--white); border: 2px solid var(--gray-border); border-radius: 16px; padding: 22px; cursor: pointer; text-align: left; transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; display: flex; flex-direction: column; gap: 6px; }
+    .role-option:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .role-option .ro-icon { font-size: 30px; margin-bottom: 6px; }
+    .role-option h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.1px; }
+    .role-option p { font-size: 12px; color: var(--gray-mid); line-height: 1.55; }
+    .role-option .ro-tag { margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--red); }
+    @media (max-width: 600px) { .role-gate-options { grid-template-columns: 1fr; } .role-gate-card { padding: 32px 24px; } }
+
+    /* Champion distribution card */
+    .distribute { background: linear-gradient(135deg, #fff 0%, #fdf0ed 100%); border: 1px solid var(--red-light); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 28px; display: flex; align-items: center; gap: 18px; }
+    .distribute .dist-icon { font-size: 32px; flex-shrink: 0; }
+    .distribute .dist-body { flex: 1; }
+    .distribute h3 { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+    .distribute p { font-size: 13px; color: var(--gray-mid); line-height: 1.55; }
+    .distribute .dist-actions { display: flex; gap: 10px; flex-shrink: 0; }
+    .dist-btn { font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1.5px solid var(--red); background: var(--white); color: var(--red); cursor: pointer; transition: background 0.15s; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .dist-btn:hover { background: var(--red-light); }
+    .dist-btn.primary { background: var(--red); color: #fff; border-color: var(--red); }
+    .dist-btn.primary:hover { background: var(--red-dark); border-color: var(--red-dark); }
+    .dist-btn.copied { background: #15803d; color: #fff; border-color: #15803d; }
   </style>
 </head>
-<body>
+<body data-role="champion">
 
 <aside id="sidebar">
   <div class="logo">
@@ -177,41 +215,67 @@
       <small>Todoist Training</small>
     </div>
   </div>
+  <div class="role-indicator champion-only">You're viewing as <strong>Champion</strong></div>
+  <div class="role-indicator team-only">You're viewing as <strong>Team member</strong></div>
   <nav>
-    <div class="nav-label">Start here</div>
-    <a href="#" class="active" onclick="return show('overview')"><span class="icon">🏠</span> Overview</a>
-    <a href="#" onclick="return show('why')"><span class="icon">🧭</span> Define your why</a>
+    <div class="nav-label champion-only">Start here</div>
+    <a class="champion-only" href="#" onclick="return show('overview')"><span class="icon">🏠</span> Overview</a>
+    <a class="champion-only" href="#" onclick="return show('why')"><span class="icon">🧭</span> Define your why</a>
 
-    <div class="nav-label">Full Course</div>
-    <a href="#" onclick="return show('m1')"><span class="icon">📗</span> 1 — Set up workspace</a>
-    <a href="#" onclick="return show('m2')"><span class="icon">📘</span> 2 — Design workflows</a>
-    <a href="#" onclick="return show('m3')"><span class="icon">📙</span> 3 — Enable your team</a>
-    <a href="#" onclick="return show('m4')"><span class="icon">📕</span> 4 — Measure &amp; sustain</a>
+    <div class="nav-label team-only">Start here</div>
+    <a class="team-only" href="#" onclick="return show('tm-overview')"><span class="icon">👋</span> Welcome</a>
 
-    <div class="nav-label">Exercises</div>
-    <a href="#" onclick="return show('exercise-1')"><span class="icon">🎯</span> Exercise 1 — Guided</a>
-    <a href="#" onclick="return show('exercise-2')"><span class="icon">🪟</span> Exercise 2 — Sandbox</a>
+    <div class="nav-label champion-only">Rollout path</div>
+    <a class="champion-only" href="#" onclick="return show('m1')"><span class="icon">📗</span> 1 — Set up workspace</a>
+    <a class="champion-only" href="#" onclick="return show('m2')"><span class="icon">📘</span> 2 — Design workflows</a>
+    <a class="champion-only" href="#" onclick="return show('m3')"><span class="icon">📙</span> 3 — Enable your team</a>
+    <a class="champion-only" href="#" onclick="return show('m4')"><span class="icon">📕</span> 4 — Measure &amp; sustain</a>
 
-    <div class="nav-label">Train your team</div>
-    <a href="#" onclick="return show('trainer')"><span class="icon">🎓</span> Running Sessions</a>
+    <div class="nav-label champion-only">For your team</div>
+    <div class="nav-label team-only">Your first week</div>
+    <a href="#" onclick="return show('tm1')"><span class="icon">🔑</span> 1 — Get set up</a>
+    <a href="#" onclick="return show('tm2')"><span class="icon">✅</span> 2 — Add &amp; complete tasks</a>
+    <a href="#" onclick="return show('tm3')"><span class="icon">📅</span> 3 — Plan your day</a>
+    <a href="#" onclick="return show('tm4')"><span class="icon">💬</span> 4 — Collaborate</a>
+    <a href="#" onclick="return show('tm5')"><span class="icon">🔍</span> 5 — Filters</a>
+
+    <div class="nav-label">Practice</div>
+    <a href="#" onclick="return show('exercise-1')"><span class="icon">🎯</span> Exercise — Guided</a>
+    <a href="#" onclick="return show('exercise-2')"><span class="icon">🪟</span> Exercise — Sandbox</a>
+
+    <div class="nav-label champion-only">Train your team</div>
+    <a class="champion-only" href="#" onclick="return show('trainer')"><span class="icon">🎓</span> Running Sessions</a>
 
     <div class="nav-label">Resources</div>
-    <a href="#" onclick="return show('resources')"><span class="icon">📎</span> Downloads & Links</a>
-    <a href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
+    <a href="#" onclick="return show('resources')"><span class="icon">📎</span> Downloads &amp; Links</a>
+    <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
-  <div class="sidebar-footer"><span class="version-badge">v1.1</span>Champion Portal</div>
+  <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
+  <div class="sidebar-footer"><span class="version-badge">v1.2</span>Champion Portal</div>
 </aside>
 
 <main id="main">
 
-  <!-- OVERVIEW -->
-  <section id="overview" class="page-section active">
+  <!-- OVERVIEW (Champion) -->
+  <section id="overview" class="page-section active champion-only">
     <div class="hero hero-xl">
       <div class="hero-icon">🚀</div>
       <div>
         <div class="hero-eyebrow">Champion Portal</div>
         <h1>Five easy steps to onboard your team</h1>
         <p>A champion's playbook for rolling out Todoist. Follow it end-to-end, or jump to the step you need most.</p>
+      </div>
+    </div>
+
+    <div class="distribute">
+      <div class="dist-icon">📨</div>
+      <div class="dist-body">
+        <h3>Share the team-member curriculum</h3>
+        <p>Your team gets their own "First week with Todoist" track. Copy the link to share, or preview what they'll see.</p>
+      </div>
+      <div class="dist-actions">
+        <button class="dist-btn" onclick="previewTeam()">Preview →</button>
+        <button class="dist-btn primary" id="copy-team-link" onclick="copyTeamLink(this)">Copy link</button>
       </div>
     </div>
 
@@ -287,8 +351,261 @@
     </div>
   </section>
 
+  <!-- TEAM MEMBER OVERVIEW -->
+  <section id="tm-overview" class="page-section team-only">
+    <div class="hero hero-xl">
+      <div class="hero-icon">👋</div>
+      <div>
+        <div class="hero-eyebrow">Welcome to Todoist</div>
+        <h1>Your first week with Todoist</h1>
+        <p>Five short lessons to get you set up, collaborating, and confident. About 20 minutes end-to-end.</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">Your getting-started path</h2>
+    <div class="path">
+      <a class="path-step" href="#" onclick="return show('tm1')">
+        <span class="pnum">1</span>
+        <div class="pbody">
+          <h3>Get set up</h3>
+          <p>Log in, meet your two workspaces, and join your team's projects.</p>
+        </div>
+        <span class="pmeta">~4 min</span>
+        <span class="parrow">→</span>
+      </a>
+      <a class="path-step" href="#" onclick="return show('tm2')">
+        <span class="pnum">2</span>
+        <div class="pbody">
+          <h3>Add &amp; complete tasks</h3>
+          <p>Use natural language, set priorities, and tick your first task off.</p>
+        </div>
+        <span class="pmeta">~5 min</span>
+        <span class="parrow">→</span>
+      </a>
+      <a class="path-step" href="#" onclick="return show('tm3')">
+        <span class="pnum">3</span>
+        <div class="pbody">
+          <h3>Plan your day</h3>
+          <p>Today, Upcoming, and Calendar — where to look each morning.</p>
+        </div>
+        <span class="pmeta">~4 min</span>
+        <span class="parrow">→</span>
+      </a>
+      <a class="path-step" href="#" onclick="return show('tm4')">
+        <span class="pnum">4</span>
+        <div class="pbody">
+          <h3>Collaborate with your team</h3>
+          <p>Assign tasks, comment, and use @mentions to keep context in one place.</p>
+        </div>
+        <span class="pmeta">~5 min</span>
+        <span class="parrow">→</span>
+      </a>
+      <a class="path-step" href="#" onclick="return show('tm5')">
+        <span class="pnum">5</span>
+        <div class="pbody">
+          <h3>Find what matters with filters</h3>
+          <p>Build a custom view for the tasks that matter most — then practice it.</p>
+        </div>
+        <span class="pmeta">~8 min</span>
+        <span class="parrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- TM1 — GET SET UP -->
+  <section id="tm1" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Your first week · Lesson 1</div>
+      <h1>Get set up</h1>
+      <p>Log in, find your way around, and join your team's shared projects.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~4 min</span>
+        <span class="mm-outcome">By the end: you're logged in and inside your team's workspace.</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">1.1 — Log in</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Open Todoist</h4><p>Go to <code>todoist.com</code> and click <strong>Log in</strong> in the top-right corner.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Sign in</h4><p>Use your email and password, or sign in with Google, Apple, or another provider.</p></div></div>
+    </div>
+
+    <h2 class="section-title">1.2 — Meet your two workspaces</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>My Projects</h4><p>Your personal space — tasks and projects only you can see.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Your team workspace</h4><p>Where your team's shared projects live. Both appear in the left sidebar.</p></div></div>
+    </div>
+
+    <h2 class="section-title">1.3 — Join a team project</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Open the workspace</h4><p>Click your team workspace name in the sidebar to see its projects.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Open the project</h4><p>Click any project listed under the workspace.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Click Join</h4><p>Use the <strong>Join</strong> button in the top-right of the project. You're in.</p></div></div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Tip</strong>
+      <p>Some workspaces auto-add everyone to all team projects — so you may already be joined to most of them.</p>
+    </div>
+
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('tm2')"><span class="lesson-num">→</span><h4>Next: Add &amp; complete tasks</h4></div>
+    </div>
+  </section>
+
+  <!-- TM2 — ADD & COMPLETE TASKS -->
+  <section id="tm2" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Your first week · Lesson 2</div>
+      <h1>Add &amp; complete tasks</h1>
+      <p>The core of Todoist: capture work fast, set priorities, and tick things off.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~5 min</span>
+        <span class="mm-outcome">By the end: you've added a task using natural language and completed it.</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">2.1 — Add a task</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Click + Add task</h4><p>Open any project (or your Inbox) and click <strong>+ Add task</strong>, or press <code>Q</code> from anywhere.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Try natural language</h4><p>Type something like: <code>Draft the onboarding brief fri 3pm p1</code>. Todoist parses the date, time, and priority automatically.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h4>Add context (optional)</h4><p>Click under the task name to add a description, links, or more detail.</p></div></div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Natural-language shortcuts</strong>
+      <p><code>mon</code>, <code>next tue</code>, <code>in 3 days</code>, <code>every monday</code>, <code>every 2 weeks</code>. Priorities: <code>p1</code> (highest, red) → <code>p3</code> (low).</p>
+    </div>
+
+    <h2 class="section-title">2.2 — Complete a task</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Click the circle</h4><p>Tap the circle to the left of the task name. It moves to your Activity Log.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Changed your mind?</h4><p>Click <strong>Undo</strong> immediately to bring it back.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Recurring tasks</h4><p>Completing a recurring task (e.g., "every monday") auto-schedules the next instance.</p></div></div>
+    </div>
+
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('tm3')"><span class="lesson-num">→</span><h4>Next: Plan your day</h4></div>
+    </div>
+  </section>
+
+  <!-- TM3 — PLAN YOUR DAY -->
+  <section id="tm3" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Your first week · Lesson 3</div>
+      <h1>Plan your day</h1>
+      <p>Two built-in views tell you what to do today and what's coming next.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~4 min</span>
+        <span class="mm-outcome">By the end: you know where to look each morning.</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">3.1 — Today</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Your daily shortlist</h4><p>Click <strong>Today</strong> in the sidebar. Everything due today lives here, sorted by time and priority.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Shape your day</h4><p>Use P1–P3 priorities to signal what matters most. Move anything unrealistic to Upcoming rather than letting it pile up.</p></div></div>
+    </div>
+
+    <h2 class="section-title">3.2 — Upcoming</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>The next 7 days</h4><p>Click <strong>Upcoming</strong> to preview everything scheduled in the coming days and weeks.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Drag to reschedule</h4><p>Grab a task and drop it on another day — Todoist updates the due date.</p></div></div>
+    </div>
+
+    <h2 class="section-title">3.3 — Calendar view</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Weekly or monthly overlay</h4><p>In Upcoming, click <strong>View → Calendar</strong> to see your work laid out like a calendar.</p></div></div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Daily habit</strong>
+      <p>Start every morning in Today. Two minutes planning beats an hour reacting later.</p>
+    </div>
+
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('tm4')"><span class="lesson-num">→</span><h4>Next: Collaborate with your team</h4></div>
+    </div>
+  </section>
+
+  <!-- TM4 — COLLABORATE -->
+  <section id="tm4" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Your first week · Lesson 4</div>
+      <h1>Collaborate with your team</h1>
+      <p>Hand work off, give feedback, and keep all task context in one place.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~5 min</span>
+        <span class="mm-outcome">By the end: you can assign, comment, and @mention like a pro.</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">4.1 — Assign a task</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>While creating</h4><p>Press <code>+</code> inside the task editor, type a teammate's name, and pick them from the dropdown.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>On an existing task</h4><p>Hover the task → click the person silhouette → select the assignee.</p></div></div>
+    </div>
+
+    <h2 class="section-title">4.2 — Comment on tasks</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h4>Open comments</h4><p>Click the speech-bubble icon on any task to open its comment thread.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h4>Post updates</h4><p>Ask questions, drop links, attach files. Everything stays tied to the task.</p></div></div>
+    </div>
+
+    <h2 class="section-title">4.3 — @mentions</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Ping a teammate</h4><p>Type <code>@name</code> in a comment. The person you mention gets a notification.</p></div></div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Keep context in one place</strong>
+      <p>Use task comments like a mini chat thread. It beats losing the conversation in Slack or email — and new joiners can read the whole history.</p>
+    </div>
+
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('tm5')"><span class="lesson-num">→</span><h4>Next: Find what matters with filters</h4></div>
+    </div>
+  </section>
+
+  <!-- TM5 — FILTERS + EXERCISE -->
+  <section id="tm5" class="page-section">
+    <div class="page-header">
+      <div class="breadcrumb">Your first week · Lesson 5</div>
+      <h1>Find what matters with filters</h1>
+      <p>A filter is a saved search across every project. Build one view, reuse it forever.</p>
+      <div class="module-meta">
+        <span class="mm-time">⏱ ~3 min + hands-on exercise</span>
+        <span class="mm-outcome">By the end: you've built a filter in a guided demo and in a live sandbox.</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">5.1 — Why filters matter</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4>Cross-project views</h4><p>Instead of jumping between projects, a filter surfaces exactly the tasks you need — e.g. "my P1 work," "everything I'm waiting on," "overdue and mine."</p></div></div>
+    </div>
+
+    <h2 class="section-title">5.2 — Common filter queries</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4><code>today &amp; assigned to: me</code></h4><p>Your day, only the items on your plate.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4><code>p1</code></h4><p>All top-priority tasks across every project.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4><code>overdue &amp; assigned to: me</code></h4><p>Catch-up mode.</p></div></div>
+      <div class="step"><div class="step-num">→</div><div class="step-content"><h4><code>@waiting</code></h4><p>Anything you've labelled as waiting on someone else.</p></div></div>
+    </div>
+
+    <h2 class="section-title">5.3 — Practice</h2>
+    <div class="lesson-list">
+      <div class="lesson-item" onclick="show('exercise-1')"><span class="lesson-num">🎯</span><h4>Exercise — Create a filter (Guided)</h4><span class="lesson-type demo">Interactive</span></div>
+      <div class="lesson-item" onclick="show('exercise-2')"><span class="lesson-num">🪟</span><h4>Exercise — Create a filter (Sandbox)</h4><span class="lesson-type">Live</span></div>
+    </div>
+
+    <div class="tip-box">
+      <strong>You've finished the first week</strong>
+      <p>That's the core toolkit. Anything else — templates, integrations, keyboard shortcuts — is icing. Ask your champion if you want to go deeper.</p>
+    </div>
+  </section>
+
   <!-- WHY -->
-  <section id="why" class="page-section">
+  <section id="why" class="page-section champion-only">
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Start</div>
       <h1>Define your why</h1>
@@ -342,7 +659,7 @@
   </section>
 
   <!-- MODULE 1 -->
-  <section id="m1" class="page-section">
+  <section id="m1" class="page-section champion-only">
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Step 1</div>
       <h1>Set up your workspace</h1>
@@ -378,7 +695,7 @@
   </section>
 
   <!-- MODULE 2 -->
-  <section id="m2" class="page-section">
+  <section id="m2" class="page-section champion-only">
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Step 2</div>
       <h1>Design your workflows</h1>
@@ -416,7 +733,7 @@
   </section>
 
   <!-- MODULE 3 -->
-  <section id="m3" class="page-section">
+  <section id="m3" class="page-section champion-only">
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Step 3</div>
       <h1>Enable your team</h1>
@@ -448,7 +765,7 @@
   </section>
 
   <!-- MODULE 4 -->
-  <section id="m4" class="page-section">
+  <section id="m4" class="page-section champion-only">
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Step 4</div>
       <h1>Measure &amp; sustain adoption</h1>
@@ -480,7 +797,7 @@
   </section>
 
   <!-- TRAIN THE TRAINER -->
-  <section id="trainer" class="page-section">
+  <section id="trainer" class="page-section champion-only">
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Train your team</div>
       <h1>Running Training Sessions</h1>
@@ -583,7 +900,7 @@
 
 
   <!-- HELP CENTER INSIGHTS -->
-  <section id="help-center" class="page-section">
+  <section id="help-center" class="page-section champion-only">
     <div class="page-header">
       <div class="breadcrumb">Champion Portal · Resources</div>
       <h1>Help Center Insights</h1>
@@ -848,6 +1165,29 @@
 
   </section>
 
+  <!-- ROLE GATE MODAL -->
+  <div class="role-gate" id="role-gate">
+    <div class="role-gate-card">
+      <div class="eyebrow">Champion Portal</div>
+      <h2>Welcome — who are you?</h2>
+      <p>Pick the track that fits. You can switch any time from the sidebar.</p>
+      <div class="role-gate-options">
+        <button class="role-option" onclick="setRole('champion')">
+          <div class="ro-icon">🚀</div>
+          <h3>I'm rolling out Todoist to my team</h3>
+          <p>Strategic rollout playbook — define your why, set up the workspace, train and measure adoption.</p>
+          <span class="ro-tag">Champion track →</span>
+        </button>
+        <button class="role-option" onclick="setRole('team')">
+          <div class="ro-icon">👋</div>
+          <h3>I'm new to Todoist — help me get started</h3>
+          <p>Five short lessons covering logging in, capturing tasks, planning your day, and collaborating.</p>
+          <span class="ro-tag">Team-member track →</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- HC ARTICLE PANEL -->
   <div class="hc-overlay" id="hc-overlay" onclick="closeHC()"></div>
   <div class="hc-panel" id="hc-panel">
@@ -909,6 +1249,52 @@
     window.scrollTo(0, 0);
     return false;
   }
+
+  function setRole(role) {
+    if (role !== 'champion' && role !== 'team') return;
+    localStorage.setItem('portal_role', role);
+    document.body.setAttribute('data-role', role);
+    document.getElementById('role-gate').classList.remove('open');
+    show(role === 'team' ? 'tm-overview' : 'overview');
+  }
+  function switchRole() {
+    const current = document.body.getAttribute('data-role');
+    setRole(current === 'team' ? 'champion' : 'team');
+  }
+  function previewTeam() {
+    // Don't persist — just peek
+    document.body.setAttribute('data-role', 'team');
+    show('tm-overview');
+  }
+  function copyTeamLink(btn) {
+    const url = location.origin + location.pathname + '?role=team';
+    const original = btn.textContent;
+    navigator.clipboard.writeText(url).then(() => {
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
+    }).catch(() => {
+      prompt('Copy this link:', url);
+    });
+  }
+
+  // Initialize role on load
+  (function initRole() {
+    const params = new URLSearchParams(location.search);
+    const roleParam = params.get('role');
+    if (roleParam === 'team' || roleParam === 'champion') {
+      setRole(roleParam);
+      return;
+    }
+    const saved = localStorage.getItem('portal_role');
+    if (saved === 'team' || saved === 'champion') {
+      document.body.setAttribute('data-role', saved);
+      if (saved === 'team') show('tm-overview');
+      return;
+    }
+    // First visit — show modal
+    document.getElementById('role-gate').classList.add('open');
+  })();
 </script>
 </body>
 </html>
