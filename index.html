@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Champion Portal — changelog
+  v1.8 (2026-04-14) — Debug "role gate not appearing in incognito": move the role-gate modal out of <main> to be a direct child of <body> (eliminates stacking-context risk), bump z-index to 9999, add -webkit-backdrop-filter for Safari, and log [portal] lifecycle messages so the console tells us which branch initRole took.
   v1.7 (2026-04-14) — Harden role-gate init: wrap localStorage + URLSearchParams in try/catch so the role modal always opens on first visit even when the browser blocks storage access (Safari private mode, strict cookie policies, content blockers).
   v1.6 (2026-04-14) — Convert TM1 to a sandbox UI tour ("Get to know Todoist"): sidebar/views/projects walkthrough instead of directing users out to todoist.com as the first step. The real-account "sign in and join your team" step becomes a prominent closing callout. Every Team Member lesson (TM1–TM5) now lives inside the shared sandbox.
   v1.5 (2026-04-14) — Convert TM4 (Collaborate) and TM5 (Filters) to split-view with sandbox. TM5 now subsumes the old standalone "Filter exercise" (removed exercise-2; sidebar Practice group dropped; Module 2 and Champion overview card repoint to TM5). Single shared sandbox iframe overlay across TM2–TM5 — state now persists when switching modules (add a task in TM2, still there in TM3).
@@ -181,7 +182,7 @@
     body[data-role="champion"] .team-only { display: none !important; }
 
     /* Role gate modal */
-    .role-gate { display: none; position: fixed; inset: 0; z-index: 400; background: rgba(28,25,23,0.55); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 24px; }
+    .role-gate { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: rgba(28,25,23,0.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 24px; }
     .role-gate.open { display: flex; }
     .role-gate-card { background: var(--white); border-radius: 20px; max-width: 720px; width: 100%; padding: 44px 44px 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
     .role-gate-card .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
@@ -259,7 +260,7 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.7</span>Champion Portal</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.8</span>Champion Portal</div>
 </aside>
 
 <main id="main">
@@ -1178,29 +1179,6 @@
     </iframe>
   </div>
 
-  <!-- ROLE GATE MODAL -->
-  <div class="role-gate" id="role-gate">
-    <div class="role-gate-card">
-      <div class="eyebrow">Champion Portal</div>
-      <h2>Welcome — who are you?</h2>
-      <p>Pick the track that fits. You can switch any time from the sidebar.</p>
-      <div class="role-gate-options">
-        <button class="role-option" onclick="setRole('champion')">
-          <div class="ro-icon">🚀</div>
-          <h3>I'm rolling out Todoist to my team</h3>
-          <p>Strategic rollout playbook — define your why, set up the workspace, train and measure adoption.</p>
-          <span class="ro-tag">Champion track →</span>
-        </button>
-        <button class="role-option" onclick="setRole('team')">
-          <div class="ro-icon">👋</div>
-          <h3>I'm new to Todoist — help me get started</h3>
-          <p>Five short lessons covering logging in, capturing tasks, planning your day, and collaborating.</p>
-          <span class="ro-tag">Team-member track →</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- HC ARTICLE PANEL -->
   <div class="hc-overlay" id="hc-overlay" onclick="closeHC()"></div>
   <div class="hc-panel" id="hc-panel">
@@ -1217,6 +1195,30 @@
   </div>
 
 </main>
+
+<!-- ROLE GATE MODAL (outside <main> to avoid any stacking-context quirks) -->
+<div class="role-gate" id="role-gate" role="dialog" aria-modal="true" aria-labelledby="role-gate-title">
+  <div class="role-gate-card">
+    <div class="eyebrow">Champion Portal</div>
+    <h2 id="role-gate-title">Welcome — who are you?</h2>
+    <p>Pick the track that fits. You can switch any time from the sidebar.</p>
+    <div class="role-gate-options">
+      <button class="role-option" onclick="setRole('champion')">
+        <div class="ro-icon">🚀</div>
+        <h3>I'm rolling out Todoist to my team</h3>
+        <p>Strategic rollout playbook — define your why, set up the workspace, train and measure adoption.</p>
+        <span class="ro-tag">Champion track →</span>
+      </button>
+      <button class="role-option" onclick="setRole('team')">
+        <div class="ro-icon">👋</div>
+        <h3>I'm new to Todoist — help me get started</h3>
+        <p>Five short lessons covering logging in, capturing tasks, planning your day, and collaborating.</p>
+        <span class="ro-tag">Team-member track →</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
   function openHC(title, url) {
     document.getElementById('hc-panel-title').textContent = title;
@@ -1299,20 +1301,27 @@
   (function initRole() {
     function openGate() {
       var gate = document.getElementById('role-gate');
-      if (gate) gate.classList.add('open');
+      if (gate) {
+        gate.classList.add('open');
+        console.log('[portal] role-gate opened (first visit)');
+      } else {
+        console.warn('[portal] role-gate element not found');
+      }
     }
     try {
       var params = new URLSearchParams(location.search);
       var roleParam = params.get('role');
       if (roleParam === 'team' || roleParam === 'champion') {
+        console.log('[portal] role from URL:', roleParam);
         setRole(roleParam);
         return;
       }
-    } catch (e) { /* ignore — fall through to gate */ }
+    } catch (e) { console.warn('[portal] URL parse failed', e); }
 
     var saved = null;
-    try { saved = localStorage.getItem('portal_role'); } catch (e) { /* private mode */ }
+    try { saved = localStorage.getItem('portal_role'); } catch (e) { console.warn('[portal] localStorage blocked', e); }
     if (saved === 'team' || saved === 'champion') {
+      console.log('[portal] role from storage:', saved);
       document.body.setAttribute('data-role', saved);
       if (saved === 'team') show('tm-overview');
       return;
