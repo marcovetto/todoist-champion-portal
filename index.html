@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Academy — changelog
+  v1.16 (2026-04-16) — Sidebar layout: nav now scrolls independently while the logo, role indicator, role-switch link and footer (with the version badge) stay pinned to the viewport. Champion mode added enough entries that the footer was scrolled below the fold and the version number was invisible.
   v1.15 (2026-04-16) — Rename the product from "Champion Portal" to "Todoist Academy" across the page title, sidebar logo, footer, hero eyebrows, role-gate eyebrow, breadcrumbs, and the changelog header. The role label "Champion" stays — that's the role, not the brand.
   v1.14 (2026-04-14) — Illustration in the Champion overview banner: tandem-bicycle artwork (./images/tandem-onboarding.png) replaces the 🚀 emoji. Hero switched from the red-gradient treatment to a light cream-peach banner so the illustration doesn't fight the backdrop. First image asset introduces the ./images/ folder.
   v1.13 (2026-04-14) — Add "Your team will ask about this" — a champion-facing primer for the five themes that dominate team-member support tickets (sync, notifications, shared project visibility, broken invites, member/admin permissions). Ready answers, not a team-facing FAQ — framed so champions respond quickly without priming their team with problem lists. Sidebar entry under "Train your team"; linked from Week 3 of the 4-week plan.
@@ -41,12 +42,15 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--font); color: var(--gray-dark); background: var(--gray-light); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-    #sidebar { width: var(--sidebar-width); min-height: 100vh; background: #1c1917; color: #fff; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100; overflow-y: auto; }
-    #sidebar .logo { display: flex; align-items: center; gap: 10px; padding: 22px 18px 18px; border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
+    #sidebar { width: var(--sidebar-width); height: 100vh; background: #1c1917; color: #fff; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100; overflow: hidden; }
+    #sidebar .logo { display: flex; align-items: center; gap: 10px; padding: 22px 18px 18px; border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; flex: 0 0 auto; }
+    #sidebar .role-indicator { flex: 0 0 auto; }
+    #sidebar .role-switch { flex: 0 0 auto; }
+    #sidebar .sidebar-footer { flex: 0 0 auto; }
     #sidebar .logo img { width: 28px; height: 28px; border-radius: 6px; }
     #sidebar .logo .logo-text span { display: block; font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
     #sidebar .logo .logo-text small { font-size: 10px; opacity: 0.4; text-transform: uppercase; letter-spacing: 0.8px; }
-    #sidebar nav { flex: 1; padding: 10px 0; }
+    #sidebar nav { flex: 1 1 auto; padding: 10px 0; overflow-y: auto; min-height: 0; }
     .nav-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.25); padding: 16px 18px 5px; }
     #sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 8px 18px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; font-weight: 500; border-radius: 8px; margin: 1px 8px; border-left: none; transition: all 0.12s; }
     #sidebar nav a:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.06); }
@@ -283,7 +287,7 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.15</span>Todoist Academy</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.16</span>Todoist Academy</div>
 </aside>
 
 <main id="main">
