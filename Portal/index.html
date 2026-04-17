@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
   Todoist Academy — changelog
+  v1.18 (2026-04-17) — Champion "Customize your team's sandbox" wizard: guides the admin through workspace name → folders (optional, skippable) → projects → teammates, encodes the config as a `tc` URL param (base64-JSON), and generates a shareable teammate link. When the portal loads with `?tc=...`, the config is forwarded to the shared sandbox iframe's `src` so the deployed sandbox can pick it up once the web design team wires up the read side. Config schema is documented inline near the wizard JS (search "SANDBOX CONFIG SCHEMA").
   v1.17 (2026-04-17) — Align look-and-feel with todoist.com. Brand red shifted from peachy #ee6449 to true Todoist #e44332 (hover #DE483A, lighter accent #EE6449 kept as --red-accent for gradients). Added warm pastel tints (green #f4fbf7, yellow #fff9eb, peach #fef8f0) as CSS vars. Imported Shantell Sans (Google Fonts) as --font-handwritten and applied it to the hero title's "easy" word — matches Todoist homepage's "Clarity, finally" handwritten treatment. Favicon downloaded locally to ./images/ (todoist-favicon.ico + 32px PNG) and wired into <head> + sidebar logo so the portal stops hotlinking from todoist.com/static.
   v1.16 (2026-04-16) — Sidebar layout: nav now scrolls independently while the logo, role indicator, role-switch link and footer (with the version badge) stay pinned to the viewport. Champion mode added enough entries that the footer was scrolled below the fold and the version number was invisible.
   v1.15 (2026-04-16) — Rename the product from "Champion Portal" to "Todoist Academy" across the page title, sidebar logo, footer, hero eyebrows, role-gate eyebrow, breadcrumbs, and the changelog header. The role label "Champion" stays — that's the role, not the brand.
@@ -241,6 +242,46 @@
     .dist-btn.primary:hover { background: var(--red-dark); border-color: var(--red-dark); }
     .dist-btn.copied { background: #15803d; color: #fff; border-color: #15803d; }
 
+    /* Champion sandbox-setup wizard */
+    .wiz { background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 28px 32px; margin-bottom: 24px; }
+    .wiz-progress { display: flex; gap: 6px; margin-bottom: 20px; }
+    .wiz-progress .wp-bar { flex: 1; height: 4px; background: var(--gray-border); border-radius: 99px; transition: background 0.2s; }
+    .wiz-progress .wp-bar.done { background: var(--red); }
+    .wiz-progress .wp-bar.current { background: var(--red-accent); }
+    .wiz-step { display: none; }
+    .wiz-step.active { display: block; }
+    .wiz-step .wz-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
+    .wiz-step h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 8px; }
+    .wiz-step .wz-sub { font-size: 14px; color: var(--gray-mid); line-height: 1.6; margin-bottom: 20px; max-width: 560px; }
+    .wiz-step label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-dark); margin-bottom: 6px; }
+    .wiz-step input[type="text"] { width: 100%; max-width: 420px; padding: 10px 12px; border: 1.5px solid var(--gray-border); border-radius: 8px; font-size: 14px; font-family: var(--font); color: var(--gray-dark); background: var(--white); transition: border-color 0.15s; }
+    .wiz-step input[type="text"]:focus { outline: none; border-color: var(--red); }
+    .wiz-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; max-width: 520px; }
+    .wiz-row { display: flex; gap: 8px; align-items: center; }
+    .wiz-row input[type="text"] { flex: 1; max-width: none; }
+    .wiz-row .wr-remove { background: none; border: none; color: var(--gray-mid); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; flex-shrink: 0; }
+    .wiz-row .wr-remove:hover { background: #f5f1ee; color: var(--red); }
+    .wiz-add { background: none; border: 1.5px dashed var(--gray-border); color: var(--gray-mid); font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: all 0.15s; font-family: var(--font); }
+    .wiz-add:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
+    .wiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--gray-border); gap: 12px; }
+    .wiz-nav .wz-left, .wiz-nav .wz-right { display: flex; gap: 10px; align-items: center; }
+    .wiz-btn { font-family: var(--font); font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 8px; border: 1.5px solid var(--gray-border); background: var(--white); color: var(--gray-dark); cursor: pointer; transition: all 0.15s; }
+    .wiz-btn:hover { border-color: var(--gray-mid); }
+    .wiz-btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+    .wiz-btn.primary:hover { background: var(--red-dark); border-color: var(--red-dark); }
+    .wiz-btn.ghost { border-color: transparent; color: var(--gray-mid); }
+    .wiz-btn.ghost:hover { color: var(--red); background: var(--red-light); }
+    .wiz-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .wiz-summary { background: var(--tint-peach); border: 1px solid var(--red-light); border-radius: 10px; padding: 16px 18px; margin-bottom: 18px; }
+    .wiz-summary h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--red); margin-bottom: 8px; }
+    .wiz-summary dl { display: grid; grid-template-columns: 100px 1fr; gap: 6px 14px; font-size: 13px; }
+    .wiz-summary dt { color: var(--gray-mid); font-weight: 500; }
+    .wiz-summary dd { color: var(--gray-dark); font-weight: 500; }
+    .wiz-sharebox { background: var(--gray-light); border: 1px dashed var(--gray-border); border-radius: 10px; padding: 14px 16px; font-family: 'Menlo', 'Monaco', monospace; font-size: 12px; color: var(--gray-dark); word-break: break-all; margin-bottom: 14px; line-height: 1.5; }
+    .wiz-hint { font-size: 12px; color: var(--gray-mid); line-height: 1.55; }
+    .wiz-status { margin-top: 18px; padding: 14px 16px; border-radius: 10px; background: var(--tint-green); border: 1px solid #d7efdf; color: #14532d; font-size: 13px; display: none; }
+    .wiz-status.show { display: block; }
+
     /* Shared sandbox overlay — one iframe, persists state across all split-view lessons */
     #sandbox-overlay { position: fixed; top: 0; right: 0; bottom: 0; left: calc(var(--sidebar-width) + 400px); display: none; flex-direction: column; z-index: 50; background: var(--white); border-left: 1px solid var(--gray-border); }
     body.sandbox-visible #sandbox-overlay { display: flex; }
@@ -286,6 +327,7 @@
     <a href="#" onclick="return show('tm5')"><span class="icon">🔍</span> 5 — Filters</a>
 
     <div class="nav-label champion-only">Train your team</div>
+    <a class="champion-only" href="#" onclick="return show('champion-setup')"><span class="icon">🧩</span> Customize sandbox</a>
     <a class="champion-only" href="#" onclick="return show('trainer')"><span class="icon">🎓</span> Running Sessions</a>
     <a class="champion-only" href="#" onclick="return show('team-questions')"><span class="icon">💬</span> Team questions</a>
 
@@ -294,7 +336,7 @@
     <a class="champion-only" href="#" onclick="return show('help-center')"><span class="icon">📊</span> Help Center Insights</a>
   </nav>
   <a href="#" class="role-switch" onclick="switchRole(); return false;">Switch role ↻</a>
-  <div class="sidebar-footer"><span class="version-badge">v1.17</span>Todoist Academy</div>
+  <div class="sidebar-footer"><span class="version-badge">v1.18</span>Todoist Academy</div>
 </aside>
 
 <main id="main">
@@ -314,7 +356,7 @@
       <div class="dist-icon">📨</div>
       <div class="dist-body">
         <h3>Share the team-member curriculum</h3>
-        <p>Your team gets their own "First week with Todoist" track. Copy the link to share, or preview what they'll see.</p>
+        <p>Your team gets their own "First week with Todoist" track. <a href="#" onclick="return show('champion-setup')" style="color:var(--red);font-weight:600;text-decoration:none;">Customize the sandbox</a> first so it mirrors your real workspace — or copy the generic link.</p>
       </div>
       <div class="dist-actions">
         <button class="dist-btn" onclick="previewTeam()">Preview →</button>
@@ -1379,6 +1421,85 @@
   </section>
 
 
+  <!-- CHAMPION SANDBOX-SETUP WIZARD -->
+  <section id="champion-setup" class="page-section champion-only">
+    <div class="page-header">
+      <div class="breadcrumb">Todoist Academy · Train your team</div>
+      <h1>Customize your team's sandbox</h1>
+      <p>Build a test configuration that mirrors your real workspace — team name, folders, projects, teammates. Your team gets a shareable link that opens the Academy with the sandbox already dressed up in their own world, so they practice on something familiar.</p>
+    </div>
+
+    <div class="wiz" id="wiz-root">
+      <div class="wiz-progress" id="wiz-progress">
+        <div class="wp-bar current"></div>
+        <div class="wp-bar"></div>
+        <div class="wp-bar"></div>
+        <div class="wp-bar"></div>
+        <div class="wp-bar"></div>
+      </div>
+
+      <!-- Step 1: Workspace -->
+      <div class="wiz-step active" data-step="1">
+        <div class="wz-eyebrow">Step 1 of 4</div>
+        <h2>What's your team called?</h2>
+        <p class="wz-sub">The workspace name your team sees every day. Use what you'd actually type in Todoist — "Acme Marketing," not "Test."</p>
+        <label for="wiz-workspace">Team / workspace name</label>
+        <input type="text" id="wiz-workspace" placeholder="e.g. Acme Marketing" maxlength="60" />
+      </div>
+
+      <!-- Step 2: Folders (optional, skippable) -->
+      <div class="wiz-step" data-step="2">
+        <div class="wz-eyebrow">Step 2 of 4 · Optional</div>
+        <h2>How do you group projects?</h2>
+        <p class="wz-sub">Folders bucket related projects — e.g. "Campaigns," "Operations." Skip this if your team doesn't use folders, or only has a handful of projects.</p>
+        <div class="wiz-rows" id="wiz-folder-rows"></div>
+        <button type="button" class="wiz-add" onclick="wizAddRow('folder')">+ Add folder</button>
+      </div>
+
+      <!-- Step 3: Projects -->
+      <div class="wiz-step" data-step="3">
+        <div class="wz-eyebrow">Step 3 of 4</div>
+        <h2>Which projects should your team see?</h2>
+        <p class="wz-sub">Pick 2–4 real projects your team works in. Seeing familiar names is what makes the sandbox feel like home instead of a demo.</p>
+        <div class="wiz-rows" id="wiz-project-rows"></div>
+        <button type="button" class="wiz-add" onclick="wizAddRow('project')">+ Add project</button>
+      </div>
+
+      <!-- Step 4: Teammates -->
+      <div class="wiz-step" data-step="4">
+        <div class="wz-eyebrow">Step 4 of 4</div>
+        <h2>Who's on the team?</h2>
+        <p class="wz-sub">First names are enough — 3 to 6 teammates. These show up as assignable collaborators in the sandbox so the collaboration lesson has someone to @-mention.</p>
+        <div class="wiz-rows" id="wiz-teammate-rows"></div>
+        <button type="button" class="wiz-add" onclick="wizAddRow('teammate')">+ Add teammate</button>
+      </div>
+
+      <!-- Step 5: Review + share -->
+      <div class="wiz-step" data-step="5">
+        <div class="wz-eyebrow">Ready to share</div>
+        <h2>Review your sandbox configuration</h2>
+        <p class="wz-sub">This is what your team will see. You can edit later — re-running this wizard generates a fresh link.</p>
+        <div class="wiz-summary" id="wiz-summary"></div>
+        <label>Shareable teammate link</label>
+        <div class="wiz-sharebox" id="wiz-share-url">—</div>
+        <p class="wiz-hint">Send this link in Slack, email, or your calendar invite. It opens the Academy in the team-member track with the sandbox pre-loaded with your config.</p>
+        <div class="wiz-status" id="wiz-copy-status">Link copied to clipboard ✓</div>
+      </div>
+
+      <div class="wiz-nav">
+        <div class="wz-left">
+          <button type="button" class="wiz-btn" id="wiz-back" onclick="wizBack()">← Back</button>
+        </div>
+        <div class="wz-right">
+          <button type="button" class="wiz-btn ghost" id="wiz-skip" onclick="wizSkip()" style="display:none;">Skip this step</button>
+          <button type="button" class="wiz-btn primary" id="wiz-next" onclick="wizNext()">Continue →</button>
+          <button type="button" class="wiz-btn primary" id="wiz-copy" onclick="wizCopy(this)" style="display:none;">Copy link</button>
+          <button type="button" class="wiz-btn ghost" id="wiz-preview" onclick="wizPreview()" style="display:none;">Preview as team member →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- SHARED SANDBOX OVERLAY — one iframe reused across all TM sandbox lessons so state persists -->
   <div id="sandbox-overlay" aria-hidden="true">
     <div class="so-header">
@@ -1479,6 +1600,8 @@
     });
     // Toggle the shared sandbox overlay — one persistent iframe reused across TM sandbox lessons.
     document.body.classList.toggle('sandbox-visible', SANDBOX_SECTIONS.has(id));
+    // Keep the sandbox iframe URL in sync with the current config whenever it becomes visible
+    if (SANDBOX_SECTIONS.has(id)) syncSandboxIframe();
     window.scrollTo(0, 0);
     return false;
   }
@@ -1500,7 +1623,7 @@
     show('tm-overview');
   }
   function copyTeamLink(btn) {
-    const url = location.origin + location.pathname + '?role=team';
+    const url = buildTeamLink();
     const original = btn.textContent;
     navigator.clipboard.writeText(url).then(() => {
       btn.textContent = 'Copied ✓';
@@ -1509,6 +1632,287 @@
     }).catch(() => {
       prompt('Copy this link:', url);
     });
+  }
+
+  // =========================================================================
+  // SANDBOX CONFIG SCHEMA (v1) — handed off to the deployed sandbox via `tc`
+  // param. The Portal encodes this JSON as base64 (Unicode-safe) and appends
+  // `?tc=<encoded>` to both the shareable teammate link AND the sandbox iframe
+  // src. The deployed sandbox at todoistsandbox.netlify.app should, on load:
+  //   1. Read `tc` from its own URL params
+  //   2. base64-decode + JSON.parse
+  //   3. Seed its UI state so the workspace/folders/projects/teammates named
+  //      here appear in the sidebar and task detail panes
+  //
+  //   {
+  //     "v": 1,                    // schema version
+  //     "w": "Acme Marketing",     // workspace / team name
+  //     "f": ["Campaigns", "Ops"], // folders (may be empty — optional step)
+  //     "p": ["Q2 launch", "…"],   // project names (2–4 recommended)
+  //     "m": ["Ana", "Ben", "Cho"] // teammate first names (3–6 recommended)
+  //   }
+  //
+  // Keys are intentionally short to keep the URL under typical mail/chat
+  // length limits. The portal side (this file) is the source of truth for
+  // generation; the sandbox side owns the read + render.
+  // =========================================================================
+
+  const SANDBOX_IFRAME_BASE = 'https://todoistsandbox.netlify.app';
+
+  function encodeConfig(cfg) {
+    try {
+      const json = JSON.stringify(cfg);
+      // Unicode-safe base64 (handles accented names etc.)
+      const b64 = btoa(unescape(encodeURIComponent(json)));
+      return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    } catch (e) { return ''; }
+  }
+  function decodeConfig(param) {
+    try {
+      let b64 = param.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      const json = decodeURIComponent(escape(atob(b64)));
+      const cfg = JSON.parse(json);
+      if (cfg && typeof cfg === 'object') return cfg;
+    } catch (e) { /* fall through */ }
+    return null;
+  }
+  function getStoredConfig() {
+    try {
+      const raw = localStorage.getItem('portal_sandbox_config');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  function setStoredConfig(cfg) {
+    try { localStorage.setItem('portal_sandbox_config', JSON.stringify(cfg)); } catch (e) {}
+  }
+
+  function currentTcParam() {
+    // Prefer URL param (the trainee view) over localStorage (the champion who built it).
+    try {
+      const fromUrl = new URLSearchParams(location.search).get('tc');
+      if (fromUrl) return fromUrl;
+    } catch (e) {}
+    const stored = getStoredConfig();
+    return stored ? encodeConfig(stored) : '';
+  }
+
+  function buildTeamLink() {
+    const tc = currentTcParam();
+    const base = location.origin + location.pathname + '?role=team';
+    return tc ? base + '&tc=' + encodeURIComponent(tc) : base;
+  }
+
+  function syncSandboxIframe() {
+    const frame = document.getElementById('shared-sandbox');
+    if (!frame) return;
+    const tc = currentTcParam();
+    const wanted = tc ? SANDBOX_IFRAME_BASE + '?tc=' + encodeURIComponent(tc) : SANDBOX_IFRAME_BASE;
+    if (frame.getAttribute('src') !== wanted) frame.setAttribute('src', wanted);
+  }
+
+  // -------- Wizard state + rendering ---------------------------------------
+  const WIZ_TOTAL = 5;
+  const wizState = { step: 1, workspace: '', folders: [], projects: [], teammates: [] };
+  const WIZ_COLLECTIONS = { folder: 'folders', project: 'projects', teammate: 'teammates' };
+  const WIZ_PLACEHOLDERS = {
+    folder: ['Campaigns', 'Operations', 'Client work'],
+    project: ['Q2 launch', 'Website refresh', 'Content calendar', 'Team OKRs'],
+    teammate: ['Ana', 'Ben', 'Cho', 'Dani', 'Evan']
+  };
+  const WIZ_ROW_IDS = { folder: 'wiz-folder-rows', project: 'wiz-project-rows', teammate: 'wiz-teammate-rows' };
+
+  function wizRenderRows(kind) {
+    const container = document.getElementById(WIZ_ROW_IDS[kind]);
+    if (!container) return;
+    const values = wizState[WIZ_COLLECTIONS[kind]];
+    const placeholders = WIZ_PLACEHOLDERS[kind];
+    container.innerHTML = '';
+    values.forEach((val, i) => {
+      const row = document.createElement('div');
+      row.className = 'wiz-row';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = val;
+      input.placeholder = placeholders[i % placeholders.length];
+      input.maxLength = 40;
+      input.addEventListener('input', (e) => { wizState[WIZ_COLLECTIONS[kind]][i] = e.target.value; });
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'wr-remove';
+      remove.textContent = '✕';
+      remove.setAttribute('aria-label', 'Remove');
+      remove.addEventListener('click', () => {
+        wizState[WIZ_COLLECTIONS[kind]].splice(i, 1);
+        wizRenderRows(kind);
+      });
+      row.appendChild(input);
+      row.appendChild(remove);
+      container.appendChild(row);
+    });
+  }
+
+  function wizAddRow(kind) {
+    // Persist any in-flight input values before re-rendering (handled by input listeners)
+    wizState[WIZ_COLLECTIONS[kind]].push('');
+    wizRenderRows(kind);
+    const container = document.getElementById(WIZ_ROW_IDS[kind]);
+    const lastInput = container.querySelector('.wiz-row:last-child input');
+    if (lastInput) lastInput.focus();
+  }
+
+  function wizShowStep(n) {
+    wizState.step = n;
+    document.querySelectorAll('#wiz-root .wiz-step').forEach(el => {
+      el.classList.toggle('active', Number(el.dataset.step) === n);
+    });
+    // Progress bars
+    document.querySelectorAll('#wiz-progress .wp-bar').forEach((bar, i) => {
+      bar.classList.remove('done', 'current');
+      if (i + 1 < n) bar.classList.add('done');
+      if (i + 1 === n) bar.classList.add('current');
+    });
+    // Buttons
+    const back = document.getElementById('wiz-back');
+    const next = document.getElementById('wiz-next');
+    const skip = document.getElementById('wiz-skip');
+    const copy = document.getElementById('wiz-copy');
+    const prev = document.getElementById('wiz-preview');
+    back.disabled = n === 1;
+    // Step 2 is folders — optional + skippable
+    skip.style.display = n === 2 ? 'inline-flex' : 'none';
+    // Final (review) step swaps primary action to copy-link + preview
+    const onFinal = n === WIZ_TOTAL;
+    next.style.display = onFinal ? 'none' : 'inline-flex';
+    copy.style.display = onFinal ? 'inline-flex' : 'none';
+    prev.style.display = onFinal ? 'inline-flex' : 'none';
+    if (onFinal) wizRenderSummary();
+  }
+
+  function wizCollectStep() {
+    // Sync inputs from the DOM before validation (in case of uncommitted typing on Enter)
+    const ws = document.getElementById('wiz-workspace');
+    if (ws) wizState.workspace = ws.value.trim();
+    ['folder', 'project', 'teammate'].forEach(kind => {
+      const container = document.getElementById(WIZ_ROW_IDS[kind]);
+      if (!container) return;
+      wizState[WIZ_COLLECTIONS[kind]] = Array.from(container.querySelectorAll('input')).map(i => i.value.trim());
+    });
+  }
+
+  function wizValidate(step) {
+    wizCollectStep();
+    if (step === 1 && !wizState.workspace) {
+      alert('Give your workspace a name — it\'s what your team will see in the sandbox sidebar.');
+      return false;
+    }
+    if (step === 3) {
+      const nonEmpty = wizState.projects.filter(Boolean);
+      if (nonEmpty.length === 0) {
+        alert('Add at least one project so your team has somewhere to practice.');
+        return false;
+      }
+      wizState.projects = nonEmpty;
+    }
+    if (step === 4) {
+      const nonEmpty = wizState.teammates.filter(Boolean);
+      if (nonEmpty.length === 0) {
+        alert('Add at least one teammate so the collaboration lesson has someone to @-mention.');
+        return false;
+      }
+      wizState.teammates = nonEmpty;
+    }
+    return true;
+  }
+
+  function wizNext() {
+    if (!wizValidate(wizState.step)) return;
+    // Clean folders when leaving step 2 (drop empties — it's optional)
+    if (wizState.step === 2) wizState.folders = wizState.folders.filter(Boolean);
+    if (wizState.step < WIZ_TOTAL) wizShowStep(wizState.step + 1);
+  }
+  function wizBack() {
+    wizCollectStep();
+    if (wizState.step > 1) wizShowStep(wizState.step - 1);
+  }
+  function wizSkip() {
+    // Skip only applies to step 2 (folders)
+    if (wizState.step !== 2) return;
+    wizState.folders = [];
+    wizShowStep(3);
+  }
+
+  function wizBuildConfig() {
+    return {
+      v: 1,
+      w: wizState.workspace,
+      f: wizState.folders.filter(Boolean),
+      p: wizState.projects.filter(Boolean),
+      m: wizState.teammates.filter(Boolean)
+    };
+  }
+
+  function wizRenderSummary() {
+    const cfg = wizBuildConfig();
+    setStoredConfig(cfg);
+    const summary = document.getElementById('wiz-summary');
+    const foldersLine = cfg.f.length ? cfg.f.join(', ') : '— (skipped)';
+    summary.innerHTML =
+      '<h4>Your test configuration</h4>' +
+      '<dl>' +
+        '<dt>Workspace</dt><dd>' + escapeHtml(cfg.w) + '</dd>' +
+        '<dt>Folders</dt><dd>' + escapeHtml(foldersLine) + '</dd>' +
+        '<dt>Projects</dt><dd>' + escapeHtml(cfg.p.join(', ')) + '</dd>' +
+        '<dt>Teammates</dt><dd>' + escapeHtml(cfg.m.join(', ')) + '</dd>' +
+      '</dl>';
+    const link = buildTeamLink();
+    document.getElementById('wiz-share-url').textContent = link;
+    // Also keep the sandbox iframe in sync so the champion's preview reflects the config
+    syncSandboxIframe();
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function wizCopy(btn) {
+    const url = buildTeamLink();
+    const status = document.getElementById('wiz-copy-status');
+    const original = btn.textContent;
+    navigator.clipboard.writeText(url).then(() => {
+      btn.textContent = 'Copied ✓';
+      if (status) status.classList.add('show');
+      setTimeout(() => {
+        btn.textContent = original;
+        if (status) status.classList.remove('show');
+      }, 2200);
+    }).catch(() => {
+      prompt('Copy this link:', url);
+    });
+  }
+
+  function wizPreview() {
+    // Open the trainee view in a new tab so the champion keeps their setup context
+    window.open(buildTeamLink(), '_blank');
+  }
+
+  function wizInit() {
+    // Load prior config if the champion already ran the wizard
+    const stored = getStoredConfig();
+    if (stored) {
+      wizState.workspace = stored.w || '';
+      wizState.folders = Array.isArray(stored.f) ? stored.f.slice() : [];
+      wizState.projects = Array.isArray(stored.p) ? stored.p.slice() : [];
+      wizState.teammates = Array.isArray(stored.m) ? stored.m.slice() : [];
+    }
+    // Seed reasonable starting rows if empty
+    if (wizState.projects.length === 0) wizState.projects = ['', ''];
+    if (wizState.teammates.length === 0) wizState.teammates = ['', '', ''];
+    document.getElementById('wiz-workspace').value = wizState.workspace;
+    wizRenderRows('folder');
+    wizRenderRows('project');
+    wizRenderRows('teammate');
+    wizShowStep(1);
   }
 
   // Initialize role on load
@@ -1542,6 +1946,27 @@
     }
     // First visit (or any failure reading storage) — show the role gate
     openGate();
+  })();
+
+  // Pick up a ?tc= param on load — trainees clicking the champion's shareable
+  // link land here; stash the decoded config in localStorage so subsequent
+  // navigation (TM lessons, sandbox iframe) can use it.
+  (function initSandboxConfig() {
+    try {
+      const tc = new URLSearchParams(location.search).get('tc');
+      if (tc) {
+        const cfg = decodeConfig(tc);
+        if (cfg) setStoredConfig(cfg);
+      }
+    } catch (e) { /* ignore */ }
+    // Make sure the iframe src reflects whatever config we have (from URL or storage)
+    syncSandboxIframe();
+  })();
+
+  // Initialize the champion wizard (inputs + saved state). Safe to run once
+  // at page load — the wizard section is hidden until the champion opens it.
+  (function bootstrapWizard() {
+    if (document.getElementById('wiz-root')) wizInit();
   })();
 </script>
 </body>

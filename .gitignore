@@ -1,0 +1,6 @@
+# Local-only: the Todoist sandbox is its own separate repo (Doist/todoist-web
+# clone). It must not be committed into the Academy/Portal repo.
+Todoist sandbox/
+
+# macOS
+.DS_Store
